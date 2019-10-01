@@ -35,19 +35,32 @@ aus.dat$poli = ifelse(aus.dat$`V84: Interest in politics` > 0, aus.dat$`V84: Int
 aus.dat$citizen = aus.dat$`V246: Respondent citizen`
 aus.dat.citizen = filter(aus.dat, citizen == 1)
 aus.dat.immi = filter(aus.dat, citizen != 1)
+aus.dat.immi.2 = filter(aus.dat, `V243_AU: Mother's Country of origin (AU)` != 1101 | `V244_AU: Father's Country of origin (AU)` != 1101) # 1101 as Australia
 ```
 
 ```{r, warning=FALSE, message=FALSE}
 # fit.citizen = lm(poli ~ age + ethnic + gender + edu, aus.data = aus.dat.citizen)
 # summary(fit.citizen)
+
+# absolute level
 fit.aus.immi = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.immi)
 summary(fit.aus.immi)
 
+# native mean
 aus.poli.mean = mean(na.omit(aus.dat.citizen$poli))
 aus.dat.immi$poli.gap = aus.dat.immi$poli - aus.poli.mean
 
+# gap w/ native mean
 fit.aus.immi.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.immi)
 summary(fit.aus.immi.gap)
+
+# 2nd generation immigrants
+fit.aus.immi.2 = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.immi.2)
+summary(fit.aus.immi.2)
+aus.dat.immi.2$poli.gap = aus.dat.immi.2$poli - aus.poli.mean
+# gap w/ native mean
+fit.aus.immi.2.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.immi.2)
+summary(fit.aus.immi.2.gap)
 ```
 
 ```{r, message=FALSE, warning=FALSE}
