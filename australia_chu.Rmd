@@ -1,0 +1,61 @@
+---
+title: "CIVIX@Australia"
+author: "Yuan-Ning Chu"
+aus.date: "10/1/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# S Korea
+
+
+
+# Australia
+
+```{r, warning=FALSE, message=FALSE}
+aus.dat = readxl::read_xlsx("F00007577-WV6_data_Australia_2012_Excel_v20180912.xlsx")
+
+# control variables
+aus.dat$age = ifelse(aus.dat$`V242: Age` > 0, aus.dat$`V242: Age`, NA)
+aus.dat$ethnic = ifelse(aus.dat$`V254: Ethnic group` == 101, 0, 1) # 0 as Australian/English speaking, 1 as others
+aus.dat$gender = aus.dat$`V240: Sex`
+aus.dat$edu = ifelse(aus.dat$`V248: Highest educational level attained` > 0, aus.dat$`V248: Highest educational level attained`, NA)
+
+# DV: interested in politics
+aus.dat$poli = ifelse(aus.dat$`V84: Interest in politics` > 0, aus.dat$`V84: Interest in politics`, NA)
+
+# citizenship status
+# aus.dat$citizen = ifelse(aus.dat$`V246: Respondent citizen` > 0, aus.dat$`V246: Respondent citizen`, NA)
+aus.dat$citizen = aus.dat$`V246: Respondent citizen`
+aus.dat.citizen = filter(aus.dat, citizen == 1)
+aus.dat.immi = filter(aus.dat, citizen != 1)
+```
+
+```{r, warning=FALSE, message=FALSE}
+# fit.citizen = lm(poli ~ age + ethnic + gender + edu, aus.data = aus.dat.citizen)
+# summary(fit.citizen)
+fit.aus.immi = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.immi)
+summary(fit.aus.immi)
+
+aus.poli.mean = mean(na.omit(aus.dat.citizen$poli))
+aus.dat.immi$poli.gap = aus.dat.immi$poli - aus.poli.mean
+
+fit.aus.immi.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.immi)
+summary(fit.aus.immi.gap)
+```
+
+```{r, message=FALSE, warning=FALSE}
+
+```
+
+# New Zealand
+
+# Turkey
+
+# Argentina
