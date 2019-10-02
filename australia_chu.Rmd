@@ -10,32 +10,53 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+library(plm) # fixed effect
 ```
 
-# S Korea
+# Australia, New Zealand, Turkey, Argentina, and South Korea
 
+```{r dat, warning=FALSE, message=FALSE}
+aus.dat = readxl::read_xlsx("F00007577-WV6_data_Australia_2012_Excel_v20180912.xlsx") # country code 36
+nz.dat = readxl::read_xlsx("F00007608-WV6_Data_New_Zealand_2011_Excel_v20180912.xlsx") # country code 554
+tk.dat = readxl::read_xlsx("F00007629-WV6_Data_Turkey_2012_Excel_v20180912.xlsx") # country code 792
+at.dat = readxl::read_xlsx("F00007575-WV6_Data_Argentina_2013_Excel_v20180912.xlsx") # country code 32
+sk.dat = readxl::read_xlsx("F00007621-WV6_Data_South_Korea_2010_Excel_v20180912.xlsx") # country code 410
 
+# ethnic group
+aus.dat$ethnic = ifelse(aus.dat$`V254: Ethnic group` == 101, 0, 1) # 0 as Australian/English speaking, 1 as others
+nz.dat$ethnic = ifelse(nz.dat$`V254: Ethnic group` == 554006 | nz.dat$`V254: Ethnic group` == 554003, 0, 1) # 554006 as NZ, 554003 as European, 0 as majority and 1 as others
+tk.dat$ethnic = 0
+at.dat$ethnic = 0
+sk.dat$ethnic = 0 # question not asked in these three countries; assume all majority
 
-# Australia
+dat = rbind(aus.dat, nz.dat, tk.dat, at.dat, sk.dat)
+```
 
 ```{r, warning=FALSE, message=FALSE}
-aus.dat = readxl::read_xlsx("F00007577-WV6_data_Australia_2012_Excel_v20180912.xlsx")
-
+# for country fixed effect
+dat$country = dat$`V2: Country Code`
 # control variables
-aus.dat$age = ifelse(aus.dat$`V242: Age` > 0, aus.dat$`V242: Age`, NA)
-aus.dat$ethnic = ifelse(aus.dat$`V254: Ethnic group` == 101, 0, 1) # 0 as Australian/English speaking, 1 as others
-aus.dat$gender = aus.dat$`V240: Sex`
-aus.dat$edu = ifelse(aus.dat$`V248: Highest educational level attained` > 0, aus.dat$`V248: Highest educational level attained`, NA)
+dat$age = ifelse(dat$`V242: Age` > 0, dat$`V242: Age`, NA)
+# dat$ethnic = ifelse(dat$`V254: Ethnic group` == 101, 0, 1) # 0 as Australian/English speaking, 1 as others
+dat$gender = dat$`V240: Sex`
+dat$edu = ifelse(dat$`V248: Highest educational level attained` > 0, dat$`V248: Highest educational level attained`, NA)
 
 # DV: interested in politics
-aus.dat$poli = ifelse(aus.dat$`V84: Interest in politics` > 0, aus.dat$`V84: Interest in politics`, NA)
+dat$poli = ifelse(dat$`V84: Interest in politics` > 0, dat$`V84: Interest in politics`, NA)
 
 # citizenship status
-# aus.dat$citizen = ifelse(aus.dat$`V246: Respondent citizen` > 0, aus.dat$`V246: Respondent citizen`, NA)
-aus.dat$citizen = aus.dat$`V246: Respondent citizen`
-aus.dat.citizen = filter(aus.dat, citizen == 1)
-aus.dat.immi = filter(aus.dat, citizen != 1)
-aus.dat.immi.2 = filter(aus.dat, `V243_AU: Mother's Country of origin (AU)` != 1101 | `V244_AU: Father's Country of origin (AU)` != 1101) # 1101 as Australia
+dat$citizen = ifelse(dat$`V246: Respondent citizen` != 1, 0, dat$`V246: Respondent citizen`)
+
+# native mean
+mean.poli = dat %>% filter(citizen == 1) %>% group_by(country) %>% 
+  summarise(mean.poli = mean(na.omit(poli)))
+dat = merge(dat, mean.poli, by = "country", all.x = TRUE)
+
+dat.citizen = filter(dat, citizen == 1)
+dat.immi = filter(dat, citizen != 1)
+dat$sec.immi = ifelse(dat$`V243: Mother immigrant` == 1 | dat$`V244: Father immigrant` == 1, 1, 0) # self-reported parent immigrant 
+dat.sec.immi = filter(dat, sec.immi == 1)
+# dat.immi.2 = filter(dat, `V243_AU: Mother's Country of origin (AU)` != 1101 | `V244_AU: Father's Country of origin (AU)` != 1101) # 1101 as Australia
 ```
 
 ```{r, warning=FALSE, message=FALSE}
@@ -43,32 +64,155 @@ aus.dat.immi.2 = filter(aus.dat, `V243_AU: Mother's Country of origin (AU)` != 1
 # summary(fit.citizen)
 
 # absolute level
-fit.aus.immi = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.immi)
-summary(fit.aus.immi)
-
-# native mean
-aus.poli.mean = mean(na.omit(aus.dat.citizen$poli))
-aus.dat.immi$poli.gap = aus.dat.immi$poli - aus.poli.mean
+fit.immi = lm(poli ~ age + ethnic + gender + edu, data = dat.immi)
+summary(fit.immi)
 
 # gap w/ native mean
-fit.aus.immi.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.immi)
-summary(fit.aus.immi.gap)
+dat.immi$poli.gap = dat.immi$poli - dat.immi$mean.poli
+
+fit.immi.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = dat.immi)
+summary(fit.immi.gap)
 
 # 2nd generation immigrants
-fit.aus.immi.2 = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.immi.2)
-summary(fit.aus.immi.2)
-aus.dat.immi.2$poli.gap = aus.dat.immi.2$poli - aus.poli.mean
+fit.immi.2 = lm(poli ~ age + ethnic + gender + edu, data = dat.sec.immi)
+summary(fit.immi.2)
+dat.sec.immi$poli.gap = dat.sec.immi$poli - dat.sec.immi$mean.poli
 # gap w/ native mean
-fit.aus.immi.2.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.immi.2)
-summary(fit.aus.immi.2.gap)
+fit.immi.2.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = dat.sec.immi)
+summary(fit.immi.2.gap)
+```
+
+# for each country
+```{r, message=FALSE, warning=FALSE}
+aus.dat = dat %>% filter(country == 36)
+nz.dat = dat %>% filter(country == 554)
+tk.dat = dat %>% filter(country == 792)
+at.dat = dat %>% filter(country == 32)
+sk.dat = dat %>% filter(country == 410)
+
+aus.dat.immi = dat %>% filter(country == 36, citizen == 0)
+nz.dat.immi = dat %>% filter(country == 554, citizen == 0)
+tk.dat.immi = dat %>% filter(country == 792, citizen == 0)
+at.dat.immi = dat %>% filter(country == 32, citizen == 0)
+sk.dat.immi = dat %>% filter(country == 410, citizen == 0)
+
+fit.aus.1 = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.immi) # absolute level
+  aus.dat.immi$poli.gap = aus.dat.immi$poli - aus.dat.immi$mean.poli
+fit.aus.2 = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.immi) # gap
+  aus.dat.sec.immi = aus.dat %>% filter(sec.immi == 1)
+fit.aus.3 = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.sec.immi) # absolute level
+  aus.dat.sec.immi$poli.gap = aus.dat.sec.immi$poli - aus.dat.sec.immi$mean.poli
+fit.aus.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.sec.immi) # gap
+```
+
+
+```{r, message=FALSE, warning=FALSE, fig.cap='Australia: 1st generation immigrants'}
+absolute = as.vector(c(fit.aus.1$coefficients[1],confint(fit.aus.1)[1,]))
+gap = as.vector(c(fit.aus.2$coefficients[1],confint(fit.aus.2)[1,]))
+
+aus.plot = as.data.frame(rbind(absolute, gap))
+colnames(aus.plot) = c("intercept", "min", "max")
+
+aus.plot = aus.plot %>% mutate(var = c('absolute','gap'))
+
+ggplot(aus.plot,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) 
+```
+
+```{r, message=FALSE, warning=FALSE, fig.cap='Australia: 1st & 2nd generation immigrants'}
+absolute = as.vector(c(fit.aus.3$coefficients[1],confint(fit.aus.3)[1,]))
+gap = as.vector(c(fit.aus.4$coefficients[1],confint(fit.aus.4)[1,]))
+
+aus.plot = as.data.frame(rbind(absolute, gap))
+colnames(aus.plot) = c("intercept", "min", "max")
+
+aus.plot = aus.plot %>% mutate(var = c('absolute','gap'))
+
+ggplot(aus.plot,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5))
 ```
 
 ```{r, message=FALSE, warning=FALSE}
+fit.nz.1 = lm(poli ~ age + ethnic + gender + edu, data = nz.dat.immi) # absolute level
+  nz.dat.immi$poli.gap = nz.dat.immi$poli - nz.dat.immi$mean.poli
+fit.nz.2 = lm(poli.gap ~ age + ethnic + gender + edu, data = nz.dat.immi) # gap
+  nz.dat.sec.immi = nz.dat %>% filter(sec.immi == 1)
+fit.nz.3 = lm(poli ~ age + ethnic + gender + edu, data = nz.dat.sec.immi) # absolute level
+  nz.dat.sec.immi$poli.gap = nz.dat.sec.immi$poli - nz.dat.sec.immi$mean.poli
+fit.nz.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = nz.dat.sec.immi) # gap
+
 
 ```
 
-# New Zealand
+```{r, message=FALSE, warning=FALSE, fig.cap='New Zealand: 1st generation immigrants'}
+absolute = as.vector(c(fit.nz.1$coefficients[1],confint(fit.nz.1)[1,]))
+gap = as.vector(c(fit.nz.2$coefficients[1],confint(fit.nz.2)[1,]))
 
-# Turkey
+nz.plot = as.data.frame(rbind(absolute, gap))
+colnames(nz.plot) = c("intercept", "min", "max")
 
-# Argentina
+nz.plot = nz.plot %>% mutate(var = c('absolute','gap'))
+
+ggplot(nz.plot,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5))
+```
+```{r, message=FALSE, warning=FALSE, fig.cap='New Zealand: 1st & 2nd generation immigrants'}
+absolute = as.vector(c(fit.nz.3$coefficients[1],confint(fit.nz.3)[1,]))
+gap = as.vector(c(fit.nz.4$coefficients[1],confint(fit.nz.4)[1,]))
+
+nz.plot = as.data.frame(rbind(absolute, gap))
+colnames(nz.plot) = c("intercept", "min", "max")
+
+nz.plot = nz.plot %>% mutate(var = c('absolute','gap'))
+
+ggplot(nz.plot,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5))
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+fit.tk.1 = lm(poli ~ age + gender + edu, data = tk.dat.immi) # absolute level
+  tk.dat.immi$poli.gap = tk.dat.immi$poli - tk.dat.immi$mean.poli
+fit.tk.2 = lm(poli.gap ~ age + gender + edu, data = tk.dat.immi) # gap
+  tk.dat.sec.immi = tk.dat %>% filter(sec.immi == 1)
+fit.tk.3 = lm(poli ~ age + gender + edu, data = tk.dat.sec.immi) # absolute level
+  tk.dat.sec.immi$poli.gap = tk.dat.sec.immi$poli - tk.dat.sec.immi$mean.poli
+fit.tk.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = tk.dat.sec.immi) # gap
+
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+fit.at.1 = lm(poli ~ age + gender + edu, data = at.dat.immi) # absolute level
+  at.dat.immi$poli.gap = at.dat.immi$poli - at.dat.immi$mean.poli
+fit.at.2 = lm(poli.gap ~ age + gender + edu, data = at.dat.immi) # gap
+  at.dat.sec.immi = at.dat %>% filter(sec.immi == 1)
+fit.at.3 = lm(poli ~ age +  gender + edu, data = at.dat.sec.immi) # absolute level
+  at.dat.sec.immi$poli.gap = at.dat.sec.immi$poli - at.dat.sec.immi$mean.poli
+fit.at.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = at.dat.sec.immi) # gap
+
+
+```
+
+
+```{r, message=FALSE, warning=FALSE}
+fit.sk.1 = lm(poli ~ age + gender + edu, data = sk.dat.immi) # absolute level
+  sk.dat.immi$poli.gap = sk.dat.immi$poli - sk.dat.immi$mean.poli
+fit.sk.2 = lm(poli.gap ~ age + gender + edu, data = sk.dat.immi) # gap
+  sk.dat.sec.immi = sk.dat %>% filter(sec.immi == 1)
+fit.sk.3 = lm(poli ~ age +  gender + edu, data = sk.dat.sec.immi) # absolute level
+  sk.dat.sec.immi$poli.gap = sk.dat.sec.immi$poli - sk.dat.sec.immi$mean.poli
+fit.sk.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = sk.dat.sec.immi) # gap
+```
+
+```{r}
+
+```
+
