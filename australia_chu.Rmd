@@ -1,5 +1,6 @@
 ---
-title: "CIVIX@Australia"
+title: "Replicating Goodman and Wright (2015)"
+subtitle: "CIVIX@Australia, New Zealand, Turkey, Argentina, and South Korea"
 author: "Yuan-Ning Chu"
 aus.date: "10/1/2019"
 output:
@@ -13,9 +14,7 @@ library(tidyverse)
 library(plm) # fixed effect
 ```
 
-# Australia, New Zealand, Turkey, Argentina, and South Korea
-
-```{r dat, warning=FALSE, message=FALSE}
+```{r dat, echo=FALSE, warning=FALSE, message=FALSE}
 aus.dat = readxl::read_xlsx("F00007577-WV6_data_Australia_2012_Excel_v20180912.xlsx") # country code 36
 nz.dat = readxl::read_xlsx("F00007608-WV6_Data_New_Zealand_2011_Excel_v20180912.xlsx") # country code 554
 tk.dat = readxl::read_xlsx("F00007629-WV6_Data_Turkey_2012_Excel_v20180912.xlsx") # country code 792
@@ -31,10 +30,13 @@ sk.dat$ethnic = 0 # question not asked in these three countries; assume all majo
 
 dat = rbind(aus.dat, nz.dat, tk.dat, at.dat, sk.dat)
 ```
+<!-- ## Descriptive statistics -->
 
-```{r, warning=FALSE, message=FALSE}
-# for country fixed effect
+<!-- + only have 141 immigrants for all the five countries -->
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+# for country fixed effect(?)
 dat$country = dat$`V2: Country Code`
+
 # control variables
 dat$age = ifelse(dat$`V242: Age` > 0, dat$`V242: Age`, NA)
 # dat$ethnic = ifelse(dat$`V254: Ethnic group` == 101, 0, 1) # 0 as Australian/English speaking, 1 as others
@@ -44,27 +46,64 @@ dat$edu = ifelse(dat$`V248: Highest educational level attained` > 0, dat$`V248: 
 # DV: interested in politics
 dat$poli = ifelse(dat$`V84: Interest in politics` > 0, dat$`V84: Interest in politics`, NA)
 
+# DV: income
+dat$income = ifelse(dat$`V239: Scale of incomes` > 0, dat$`V239: Scale of incomes` , NA)
+
+# DV: employment
+dat$employment = ifelse(dat$`V229: Employment status` == 1, 1, 
+                        ifelse(dat$`V229: Employment status` == 2, 0, -1)) # 1 = employed, 2 = unemployed, -1 = others
+
+# DV: subjective financial situation
+dat$financial = ifelse(dat$`V237: Family savings during past year`> 0, dat$`V237: Family savings during past year`, NA) 
+
+# DV: general trust 1
+dat$trust1 = ifelse(dat$`V24: Most people can be trusted` == 2, 0,
+                    ifelse(dat$`V24: Most people can be trusted` == 1, 1, NA))
+
+# DV: general trust 2
+dat$trust2 = ifelse(dat$`V56: Do you think most people would try to take advantage of you if they got a chance, or would they try to be fair?` > 0, dat$`V56: Do you think most people would try to take advantage of you if they got a chance, or would they try to be fair?`, NA)
+
 # citizenship status
 dat$citizen = ifelse(dat$`V246: Respondent citizen` != 1, 0, dat$`V246: Respondent citizen`)
 
-# native mean
-mean.poli = dat %>% filter(citizen == 1) %>% group_by(country) %>% 
-  summarise(mean.poli = mean(na.omit(poli)))
-dat = merge(dat, mean.poli, by = "country", all.x = TRUE)
-
-dat.citizen = filter(dat, citizen == 1)
-dat.immi = filter(dat, citizen != 1)
+# second generation immigrant
 dat$sec.immi = ifelse(dat$`V243: Mother immigrant` == 1 | dat$`V244: Father immigrant` == 1, 1, 0) # self-reported parent immigrant 
+
+# native mean (citizens)
+dat.mean = dat %>% filter(citizen == 1) %>% group_by(country) %>%
+  select(country,poli,income,employment,financial,trust1,trust2) %>%
+  summarise(mean.poli = mean(poli, na.rm = TRUE),
+            mean.income = mean(income, na.rm = TRUE),
+            mean.employment = mean(employment, na.rm = TRUE),
+            mean.financial = mean(financial, na.rm = TRUE),
+            mean.trust1 = mean(trust1, na.rm = TRUE),
+            mean.trust2 = mean(trust2, na.rm = TRUE))
+
+dat.immi = dat %>% filter(citizen != 1)
+dat.1 = dat.immi %>% left_join(dat.mean, by='country')
+
 dat.sec.immi = filter(dat, sec.immi == 1)
-# dat.immi.2 = filter(dat, `V243_AU: Mother's Country of origin (AU)` != 1101 | `V244_AU: Father's Country of origin (AU)` != 1101) # 1101 as Australia
+dat.2 = dat.sec.immi %>% left_join(dat.mean, by='country')
+
+# dat = merge(dat.mean, dat.immi, by = "country")
+# dat.citizen = filter(dat, citizen == 1)
+# dat.immi = filter(dat, citizen != 1)
+
+# table(dat$citizen) # 0 as immigrants
+
+```
+<!-- + If we include second generation immigrants, the sample size increases to 1,085.  -->
+```{r, echo=FALSE, include = FALSE, warning=FALSE, message=FALSE}
+# table(dat$sec.immi) # 1 as sec. gen. immigrants
 ```
 
-```{r, warning=FALSE, message=FALSE}
+
+```{r, echo=FALSE, include = FALSE, warning=FALSE, message=FALSE, eval=FALSE}
 # fit.citizen = lm(poli ~ age + ethnic + gender + edu, aus.data = aus.dat.citizen)
 # summary(fit.citizen)
 
 # absolute level
-fit.immi = lm(poli ~ age + ethnic + gender + edu, data = dat.immi)
+fit.immi = lm(poli ~ age + ethnic + gender + edu, data = dat.1)
 summary(fit.immi)
 
 # gap w/ native mean
@@ -82,137 +121,423 @@ fit.immi.2.gap = lm(poli.gap ~ age + ethnic + gender + edu, data = dat.sec.immi)
 summary(fit.immi.2.gap)
 ```
 
-# for each country
-```{r, message=FALSE, warning=FALSE}
-aus.dat = dat %>% filter(country == 36)
-nz.dat = dat %>% filter(country == 554)
-tk.dat = dat %>% filter(country == 792)
-at.dat = dat %>% filter(country == 32)
-sk.dat = dat %>% filter(country == 410)
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+h.civix = dat.1 %>% filter(country == 36 | country == 554)
+l.civix = dat.1 %>% filter(country == 792 | country == 32 | country == 410)
 
-aus.dat.immi = dat %>% filter(country == 36, citizen == 0)
-nz.dat.immi = dat %>% filter(country == 554, citizen == 0)
-tk.dat.immi = dat %>% filter(country == 792, citizen == 0)
-at.dat.immi = dat %>% filter(country == 32, citizen == 0)
-sk.dat.immi = dat %>% filter(country == 410, citizen == 0)
+h.civix.sec = dat.2 %>% filter(country == 36 | country == 554)
+l.civix.sec = dat.2 %>% filter(country == 792 | country == 32 | country == 410)
 
-fit.aus.1 = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.immi) # absolute level
-  aus.dat.immi$poli.gap = aus.dat.immi$poli - aus.dat.immi$mean.poli
-fit.aus.2 = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.immi) # gap
-  aus.dat.sec.immi = aus.dat %>% filter(sec.immi == 1)
-fit.aus.3 = lm(poli ~ age + ethnic + gender + edu, data = aus.dat.sec.immi) # absolute level
-  aus.dat.sec.immi$poli.gap = aus.dat.sec.immi$poli - aus.dat.sec.immi$mean.poli
-fit.aus.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = aus.dat.sec.immi) # gap
+# gap w/ citizen
+h.civix = h.civix %>% mutate(
+  poli.gap = poli - mean.poli, 
+  income.gap = income - mean.income,
+  employment.gap = employment - mean.employment,
+  finan.gap = financial - mean.financial, 
+  trust1.gap = trust1 - mean.trust1,
+  trust2.gap = trust2 - mean.trust2
+  )
+
+l.civix = l.civix %>% mutate(
+  poli.gap = poli - mean.poli, 
+  income.gap = income - mean.income,
+  employment.gap = employment - mean.employment,
+  finan.gap = financial - mean.financial, 
+  trust1.gap = trust1 - mean.trust1,
+  trust2.gap = trust2 - mean.trust2
+  )
+
+h.civix.sec = h.civix.sec %>% mutate(
+  poli.gap = poli - mean.poli, 
+  income.gap = income - mean.income,
+  employment.gap = employment - mean.employment,
+  finan.gap = financial - mean.financial, 
+  trust1.gap = trust1 - mean.trust1,
+  trust2.gap = trust2 - mean.trust2
+  )
+
+l.civix.sec = l.civix.sec %>% mutate(
+  poli.gap = poli - mean.poli, 
+  income.gap = income - mean.income,
+  employment.gap = employment - mean.employment,
+  finan.gap = financial - mean.financial, 
+  trust1.gap = trust1 - mean.trust1,
+  trust2.gap = trust2 - mean.trust2
+  )
+# aus.dat = dat %>% filter(country == 36)
+# nz.dat = dat %>% filter(country == 554)
+# tk.dat = dat %>% filter(country == 792)
+# at.dat = dat %>% filter(country == 32)
+# sk.dat = dat %>% filter(country == 410)
+
+# aus.dat.immi = dat %>% filter(country == 36, citizen == 0)
+# nz.dat.immi = dat %>% filter(country == 554, citizen == 0)
+# tk.dat.immi = dat %>% filter(country == 792, citizen == 0)
+# at.dat.immi = dat %>% filter(country == 32, citizen == 0)
+# sk.dat.immi = dat %>% filter(country == 410, citizen == 0)
 ```
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+poli.h.1 = lm(poli ~ age + ethnic + gender + edu, data = h.civix) # absolute level
+poli.h.2 = lm(poli.gap ~ age + ethnic + gender + edu, data = h.civix) # gap
+poli.h.3 = lm(poli ~ age + ethnic + gender + edu, data = h.civix.sec) # absolute level
+poli.h.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = h.civix.sec) # gap
 
-```{r, message=FALSE, warning=FALSE, fig.cap='Australia: 1st generation immigrants'}
-absolute = as.vector(c(fit.aus.1$coefficients[1],confint(fit.aus.1)[1,]))
-gap = as.vector(c(fit.aus.2$coefficients[1],confint(fit.aus.2)[1,]))
-
-aus.plot = as.data.frame(rbind(absolute, gap))
-colnames(aus.plot) = c("intercept", "min", "max")
-
-aus.plot = aus.plot %>% mutate(var = c('absolute','gap'))
-
-ggplot(aus.plot,aes(y=var)) + 
-  geom_point(aes(x = intercept)) + 
-  geom_errorbarh(aes(xmin = min, xmax = max)) 
+poli.l.1 = lm(poli ~ age + gender + edu, data = l.civix) # absolute level
+poli.l.2 = lm(poli.gap ~ age + gender + edu, data = l.civix) # absolute level
+poli.l.3 = lm(poli ~ age +  gender + edu, data = l.civix.sec) # absolute level
+poli.l.4 = lm(poli.gap ~ age +  gender + edu, data = l.civix.sec) # absolute level
 ```
 
-```{r, message=FALSE, warning=FALSE, fig.cap='Australia: 1st & 2nd generation immigrants'}
-absolute = as.vector(c(fit.aus.3$coefficients[1],confint(fit.aus.3)[1,]))
-gap = as.vector(c(fit.aus.4$coefficients[1],confint(fit.aus.4)[1,]))
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interest by CIVIX', fig.height=3}
+absolute.h = as.vector(c(poli.h.1$coefficients[1],confint(poli.h.1)[1,]))
+absolute.l = as.vector(c(poli.l.1$coefficients[1],confint(poli.l.1)[1,]))
 
-aus.plot = as.data.frame(rbind(absolute, gap))
-colnames(aus.plot) = c("intercept", "min", "max")
+# sec gen
+absolute.h.sec = as.vector(c(poli.h.3$coefficients[1],confint(poli.h.3)[1,]))
+absolute.l.sec = as.vector(c(poli.l.3$coefficients[1],confint(poli.l.3)[1,]))
 
-aus.plot = aus.plot %>% mutate(var = c('absolute','gap'))
+gap.h = as.vector(c(poli.h.2$coefficients[1],confint(poli.h.2)[1,]))
+gap.l = as.vector(c(poli.l.2$coefficients[1],confint(poli.l.2)[1,]))
 
-ggplot(aus.plot,aes(y=var)) + 
+# sec gen
+gap.h.sec = as.vector(c(poli.h.4$coefficients[1],confint(poli.h.4)[1,]))
+gap.l.sec = as.vector(c(poli.l.4$coefficients[1],confint(poli.l.4)[1,]))
+
+
+poli.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poli.1) = c("intercept", "min", "max")
+poli.1 = poli.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poli.1$var = factor(poli.1$var, as.character(poli.1$var))
+
+ggplot(poli.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-5, 5))
-```
-
-```{r, message=FALSE, warning=FALSE}
-fit.nz.1 = lm(poli ~ age + ethnic + gender + edu, data = nz.dat.immi) # absolute level
-  nz.dat.immi$poli.gap = nz.dat.immi$poli - nz.dat.immi$mean.poli
-fit.nz.2 = lm(poli.gap ~ age + ethnic + gender + edu, data = nz.dat.immi) # gap
-  nz.dat.sec.immi = nz.dat %>% filter(sec.immi == 1)
-fit.nz.3 = lm(poli ~ age + ethnic + gender + edu, data = nz.dat.sec.immi) # absolute level
-  nz.dat.sec.immi$poli.gap = nz.dat.sec.immi$poli - nz.dat.sec.immi$mean.poli
-fit.nz.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = nz.dat.sec.immi) # gap
-
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
 
 ```
 
-```{r, message=FALSE, warning=FALSE, fig.cap='New Zealand: 1st generation immigrants'}
-absolute = as.vector(c(fit.nz.1$coefficients[1],confint(fit.nz.1)[1,]))
-gap = as.vector(c(fit.nz.2$coefficients[1],confint(fit.nz.2)[1,]))
 
-nz.plot = as.data.frame(rbind(absolute, gap))
-colnames(nz.plot) = c("intercept", "min", "max")
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interest among 2nd generation by CIVIX', fig.height=3}
 
-nz.plot = nz.plot %>% mutate(var = c('absolute','gap'))
+poli.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
+colnames(poli.2) = c("intercept", "min", "max")
+poli.2 = poli.2 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poli.2$var = factor(poli.2$var, as.character(poli.2$var))
 
-ggplot(nz.plot,aes(y=var)) + 
+ggplot(poli.2,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-5, 5))
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
 ```
-```{r, message=FALSE, warning=FALSE, fig.cap='New Zealand: 1st & 2nd generation immigrants'}
-absolute = as.vector(c(fit.nz.3$coefficients[1],confint(fit.nz.3)[1,]))
-gap = as.vector(c(fit.nz.4$coefficients[1],confint(fit.nz.4)[1,]))
 
-nz.plot = as.data.frame(rbind(absolute, gap))
-colnames(nz.plot) = c("intercept", "min", "max")
 
-nz.plot = nz.plot %>% mutate(var = c('absolute','gap'))
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+trust1.h.1 = lm(trust1 ~ age + ethnic + gender + edu, data = h.civix) # absolute level
+trust1.h.2 = lm(trust1.gap ~ age + ethnic + gender + edu, data = h.civix) # gap
+trust1.h.3 = lm(trust1 ~ age + ethnic + gender + edu, data = h.civix.sec) # absolute level
+trust1.h.4 = lm(trust1.gap ~ age + ethnic + gender + edu, data = h.civix.sec) # gap
 
-ggplot(nz.plot,aes(y=var)) + 
+trust1.l.1 = lm(trust1 ~ age + gender + edu, data = l.civix) # absolute level
+trust1.l.2 = lm(trust1.gap ~ age + gender + edu, data = l.civix)# gap
+trust1.l.3 = lm(trust1 ~ age + gender + edu, data = l.civix.sec) # absolute level
+trust1.l.4 = lm(trust1.gap ~ age + gender + edu, data = l.civix.sec)# gap
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX', fig.height=3}
+absolute.h = as.vector(c(trust1.h.1$coefficients[1],confint(trust1.h.1)[1,]))
+absolute.l = as.vector(c(trust1.l.1$coefficients[1],confint(trust1.l.1)[1,]))
+
+# sec gen
+absolute.h.sec = as.vector(c(trust1.h.3$coefficients[1],confint(trust1.h.3)[1,]))
+absolute.l.sec = as.vector(c(trust1.l.3$coefficients[1],confint(trust1.l.3)[1,]))
+
+gap.h = as.vector(c(trust1.h.2$coefficients[1],confint(trust1.h.2)[1,]))
+gap.l = as.vector(c(trust1.l.2$coefficients[1],confint(trust1.l.2)[1,]))
+
+# sec gen
+gap.h.sec = as.vector(c(trust1.h.4$coefficients[1],confint(trust1.h.4)[1,]))
+gap.l.sec = as.vector(c(trust1.l.4$coefficients[1],confint(trust1.l.4)[1,]))
+
+
+trust1.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(trust1.1) = c("intercept", "min", "max")
+trust1.1 = trust1.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+trust1.1$var = factor(trust1.1$var, as.character(trust1.1$var))
+
+ggplot(trust1.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-5, 5))
-```
-
-
-```{r, message=FALSE, warning=FALSE}
-fit.tk.1 = lm(poli ~ age + gender + edu, data = tk.dat.immi) # absolute level
-  tk.dat.immi$poli.gap = tk.dat.immi$poli - tk.dat.immi$mean.poli
-fit.tk.2 = lm(poli.gap ~ age + gender + edu, data = tk.dat.immi) # gap
-  tk.dat.sec.immi = tk.dat %>% filter(sec.immi == 1)
-fit.tk.3 = lm(poli ~ age + gender + edu, data = tk.dat.sec.immi) # absolute level
-  tk.dat.sec.immi$poli.gap = tk.dat.sec.immi$poli - tk.dat.sec.immi$mean.poli
-fit.tk.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = tk.dat.sec.immi) # gap
-
+  coord_cartesian(xlim = c(-1.5, 1.5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
 
 ```
 
-```{r, message=FALSE, warning=FALSE}
-fit.at.1 = lm(poli ~ age + gender + edu, data = at.dat.immi) # absolute level
-  at.dat.immi$poli.gap = at.dat.immi$poli - at.dat.immi$mean.poli
-fit.at.2 = lm(poli.gap ~ age + gender + edu, data = at.dat.immi) # gap
-  at.dat.sec.immi = at.dat %>% filter(sec.immi == 1)
-fit.at.3 = lm(poli ~ age +  gender + edu, data = at.dat.sec.immi) # absolute level
-  at.dat.sec.immi$poli.gap = at.dat.sec.immi$poli - at.dat.sec.immi$mean.poli
-fit.at.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = at.dat.sec.immi) # gap
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust among 2nd generation by CIVIX', fig.height=3}
+
+trust1.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
+colnames(trust1.2) = c("intercept", "min", "max")
+trust1.2 = trust1.2 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+trust1.2$var = factor(trust1.2$var, as.character(trust1.2$var))
+
+ggplot(trust1.2,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-1.5, 1.5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
 
 
 ```
 
 
-```{r, message=FALSE, warning=FALSE}
-fit.sk.1 = lm(poli ~ age + gender + edu, data = sk.dat.immi) # absolute level
-  sk.dat.immi$poli.gap = sk.dat.immi$poli - sk.dat.immi$mean.poli
-fit.sk.2 = lm(poli.gap ~ age + gender + edu, data = sk.dat.immi) # gap
-  sk.dat.sec.immi = sk.dat %>% filter(sec.immi == 1)
-fit.sk.3 = lm(poli ~ age +  gender + edu, data = sk.dat.sec.immi) # absolute level
-  sk.dat.sec.immi$poli.gap = sk.dat.sec.immi$poli - sk.dat.sec.immi$mean.poli
-fit.sk.4 = lm(poli.gap ~ age + ethnic + gender + edu, data = sk.dat.sec.immi) # gap
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+trust2.h.1 = lm(trust2 ~ age + ethnic + gender + edu, data = h.civix) # absolute level
+trust2.h.2 = lm(trust2.gap ~ age + ethnic + gender + edu, data = h.civix) # gap
+trust2.h.3 = lm(trust2 ~ age + ethnic + gender + edu, data = h.civix.sec) # absolute level
+trust2.h.4 = lm(trust2.gap ~ age + ethnic + gender + edu, data = h.civix.sec) # gap
+
+trust2.l.1 = lm(trust2 ~ age + gender + edu, data = l.civix) # absolute level
+trust2.l.2 = lm(trust2.gap ~ age + gender + edu, data = l.civix)# gap
+trust2.l.3 = lm(trust2 ~ age + gender + edu, data = l.civix.sec) # absolute level
+trust2.l.4 = lm(trust2.gap ~ age + gender + edu, data = l.civix.sec)# gap
 ```
 
-```{r}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Whether people are fair by CIVIX', fig.height=3}
+absolute.h = as.vector(c(trust2.h.1$coefficients[1],confint(trust2.h.1)[1,]))
+absolute.l = as.vector(c(trust2.l.1$coefficients[1],confint(trust2.l.1)[1,]))
+
+# sec gen
+absolute.h.sec = as.vector(c(trust2.h.3$coefficients[1],confint(trust2.h.3)[1,]))
+absolute.l.sec = as.vector(c(trust2.l.3$coefficients[1],confint(trust2.l.3)[1,]))
+
+gap.h = as.vector(c(trust2.h.2$coefficients[1],confint(trust2.h.2)[1,]))
+gap.l = as.vector(c(trust2.l.2$coefficients[1],confint(trust2.l.2)[1,]))
+
+# sec gen
+gap.h.sec = as.vector(c(trust2.h.4$coefficients[1],confint(trust2.h.4)[1,]))
+gap.l.sec = as.vector(c(trust2.l.4$coefficients[1],confint(trust2.l.4)[1,]))
+
+
+trust2.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(trust2.1) = c("intercept", "min", "max")
+trust2.1 = trust2.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+trust2.1$var = factor(trust2.1$var, as.character(trust2.1$var))
+
+ggplot(trust2.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-60, 60)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
 
 ```
 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Whether people are fair among 2nd generation by CIVIX', fig.height=3}
+
+trust2.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
+colnames(trust2.2) = c("intercept", "min", "max")
+trust2.2 = trust2.2 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+trust2.2$var = factor(trust2.2$var, as.character(trust2.2$var))
+
+ggplot(trust2.2,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-60, 60)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+income.h.1 = lm(income ~ age + ethnic + gender + edu, data = h.civix) # absolute level
+income.h.2 = lm(income.gap ~ age + ethnic + gender + edu, data = h.civix) # gap
+income.h.3 = lm(income ~ age + ethnic + gender + edu, data = h.civix.sec) # absolute level
+income.h.4 = lm(income.gap ~ age + ethnic + gender + edu, data = h.civix.sec) # gap
+
+income.l.1 = lm(income ~ age + gender + edu, data = l.civix) # absolute level
+income.l.2 = lm(income.gap ~ age + gender + edu, data = l.civix)# gap
+income.l.3 = lm(income ~ age + gender + edu, data = l.civix.sec) # absolute level
+income.l.4 = lm(income.gap ~ age + gender + edu, data = l.civix.sec)# gap
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Household income by CIVIX', fig.height=3}
+absolute.h = as.vector(c(income.h.1$coefficients[1],confint(income.h.1)[1,]))
+absolute.l = as.vector(c(income.l.1$coefficients[1],confint(income.l.1)[1,]))
+
+# sec gen
+absolute.h.sec = as.vector(c(income.h.3$coefficients[1],confint(income.h.3)[1,]))
+absolute.l.sec = as.vector(c(income.l.3$coefficients[1],confint(income.l.3)[1,]))
+
+gap.h = as.vector(c(income.h.2$coefficients[1],confint(income.h.2)[1,]))
+gap.l = as.vector(c(income.l.2$coefficients[1],confint(income.l.2)[1,]))
+
+# sec gen
+gap.h.sec = as.vector(c(income.h.4$coefficients[1],confint(income.h.4)[1,]))
+gap.l.sec = as.vector(c(income.l.4$coefficients[1],confint(income.l.4)[1,]))
+
+
+income.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(income.1) = c("intercept", "min", "max")
+income.1 = income.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+income.1$var = factor(income.1$var, as.character(income.1$var))
+
+ggplot(income.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Household income among 2nd generation by CIVIX', fig.height=3}
+
+income.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
+colnames(income.2) = c("intercept", "min", "max")
+income.2 = income.2 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+income.2$var = factor(income.2$var, as.character(income.2$var))
+
+ggplot(income.2,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+employment.h.1 = lm(employment ~ age + ethnic + gender + edu, data = h.civix) # absolute level
+employment.h.2 = lm(employment.gap ~ age + ethnic + gender + edu, data = h.civix) # gap
+employment.h.3 = lm(employment ~ age + ethnic + gender + edu, data = h.civix.sec) # absolute level
+employment.h.4 = lm(employment.gap ~ age + ethnic + gender + edu, data = h.civix.sec) # gap
+
+employment.l.1 = lm(employment ~ age + gender + edu, data = l.civix) # absolute level
+employment.l.2 = lm(employment.gap ~ age + gender + edu, data = l.civix)# gap
+employment.l.3 = lm(employment ~ age + gender + edu, data = l.civix.sec) # absolute level
+employment.l.4 = lm(employment.gap ~ age + gender + edu, data = l.civix.sec)# gap
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Employment status by CIVIX', fig.height=3}
+absolute.h = as.vector(c(employment.h.1$coefficients[1],confint(employment.h.1)[1,]))
+absolute.l = as.vector(c(employment.l.1$coefficients[1],confint(employment.l.1)[1,]))
+
+# sec gen
+absolute.h.sec = as.vector(c(employment.h.3$coefficients[1],confint(employment.h.3)[1,]))
+absolute.l.sec = as.vector(c(employment.l.3$coefficients[1],confint(employment.l.3)[1,]))
+
+gap.h = as.vector(c(employment.h.2$coefficients[1],confint(employment.h.2)[1,]))
+gap.l = as.vector(c(employment.l.2$coefficients[1],confint(employment.l.2)[1,]))
+
+# sec gen
+gap.h.sec = as.vector(c(employment.h.4$coefficients[1],confint(employment.h.4)[1,]))
+gap.l.sec = as.vector(c(employment.l.4$coefficients[1],confint(employment.l.4)[1,]))
+
+
+employment.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employment.1) = c("intercept", "min", "max")
+employment.1 = employment.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employment.1$var = factor(employment.1$var, as.character(employment.1$var))
+
+ggplot(employment.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Employment status among 2nd generation by CIVIX', fig.height=3}
+
+employment.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
+colnames(employment.2) = c("intercept", "min", "max")
+employment.2 = employment.2 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employment.2$var = factor(employment.2$var, as.character(employment.2$var))
+
+ggplot(employment.2,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+financial.h.1 = lm(financial ~ age + ethnic + gender + edu, data = h.civix) # absolute level
+financial.h.2 = lm(finan.gap ~ age + ethnic + gender + edu, data = h.civix) # gap
+financial.h.3 = lm(financial ~ age + ethnic + gender + edu, data = h.civix.sec) # absolute level
+financial.h.4 = lm(finan.gap ~ age + ethnic + gender + edu, data = h.civix.sec) # gap
+
+financial.l.1 = lm(financial ~ age + gender + edu, data = l.civix) # absolute level
+financial.l.2 = lm(finan.gap ~ age + gender + edu, data = l.civix)# gap
+financial.l.3 = lm(financial ~ age + gender + edu, data = l.civix.sec) # absolute level
+financial.l.4 = lm(finan.gap ~ age + gender + edu, data = l.civix.sec)# gap
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX', fig.height=3}
+absolute.h = as.vector(c(financial.h.1$coefficients[1],confint(financial.h.1)[1,]))
+absolute.l = as.vector(c(financial.l.1$coefficients[1],confint(financial.l.1)[1,]))
+
+# sec gen
+absolute.h.sec = as.vector(c(financial.h.3$coefficients[1],confint(financial.h.3)[1,]))
+absolute.l.sec = as.vector(c(financial.l.3$coefficients[1],confint(financial.l.3)[1,]))
+
+gap.h = as.vector(c(financial.h.2$coefficients[1],confint(financial.h.2)[1,]))
+gap.l = as.vector(c(financial.l.2$coefficients[1],confint(financial.l.2)[1,]))
+
+# sec gen
+gap.h.sec = as.vector(c(financial.h.4$coefficients[1],confint(financial.h.4)[1,]))
+gap.l.sec = as.vector(c(financial.l.4$coefficients[1],confint(financial.l.4)[1,]))
+
+
+financial.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(financial.1) = c("intercept", "min", "max")
+financial.1 = financial.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+financial.1$var = factor(financial.1$var, as.character(financial.1$var))
+
+ggplot(financial.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX', fig.height=3}
+
+financial.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
+colnames(financial.2) = c("intercept", "min", "max")
+financial.2 = financial.2 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+financial.2$var = factor(financial.2$var, as.character(financial.2$var))
+
+ggplot(financial.2,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
