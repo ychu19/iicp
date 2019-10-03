@@ -4,8 +4,8 @@ subtitle: "CIVIX@Australia, New Zealand, Turkey, Argentina, and South Korea"
 author: "Yuan-Ning Chu"
 aus.date: "10/1/2019"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
