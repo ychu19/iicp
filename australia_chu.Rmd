@@ -12,6 +12,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(plm) # fixed effect
+library(stargazer)
 ```
 
 ```{r dat, echo=FALSE, warning=FALSE, message=FALSE}
@@ -30,7 +31,8 @@ sk.dat$ethnic = 0 # question not asked in these three countries; assume all majo
 
 dat = rbind(aus.dat, nz.dat, tk.dat, at.dat, sk.dat)
 ```
-<!-- ## Descriptive statistics -->
+## Descriptive statistics
+
 
 <!-- + only have 141 immigrants for all the five countries -->
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
