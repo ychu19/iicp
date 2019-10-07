@@ -42,7 +42,7 @@ table(sk.dat$`V246: Respondent citizen`)
 table(tk.dat$`V246: Respondent citizen`)
 ```
 
-```{r,echo=FALSE, warning=FALSE, message=FALSE}}
+```{r,echo=FALSE, warning=FALSE, message=FALSE}
 table(aus.dat$`V243: Mother immigrant` == 1 | aus.dat$`V244: Father immigrant` == 1)
 table(nz.dat$`V243: Mother immigrant` == 1 | nz.dat$`V244: Father immigrant` == 1)
 table(at.dat$`V243: Mother immigrant` == 1 | at.dat$`V244: Father immigrant` == 1)
@@ -80,7 +80,9 @@ dat$trust1 = ifelse(dat$`V24: Most people can be trusted` == 2, 0,
                     ifelse(dat$`V24: Most people can be trusted` == 1, 1, NA))
 
 # DV: general trust 2
-dat$trust2 = ifelse(dat$`V56: Do you think most people would try to take advantage of you if they got a chance, or would they try to be fair?` > 0, dat$`V56: Do you think most people would try to take advantage of you if they got a chance, or would they try to be fair?`, NA)
+dat$trust2 = ifelse(dat$`V56: Do you think most people would try to take advantage of you if they got a chance, or would they try to be fair?` > 0, dat$`V56: Do you think most people would try to take advantage of you if they got a chance, or would they try to be fair?`, NA) 
+
+### fix nz.dat --> V56 is binary in NZ!
 
 # citizenship status
 dat$citizen = ifelse(dat$`V246: Respondent citizen` != 1, 0, dat$`V246: Respondent citizen`)
