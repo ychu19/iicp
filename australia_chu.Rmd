@@ -670,7 +670,7 @@ gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
 
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interests among 2nd generation by CIVIX', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interests among 2nd generation by CIVIX in EU-15', fig.height=3}
 
 polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(polintr.1) = c("intercept", "min", "max")
@@ -680,7 +680,7 @@ polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
 ggplot(polintr.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-5, 5)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -702,7 +702,7 @@ gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
 
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX in EU-15', fig.height=3}
 
 hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(hincfel.1) = c("intercept", "min", "max")
@@ -732,7 +732,7 @@ gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
 gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust among 2nd generation by CIVIX in EU-15', fig.height=3}
 
 ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(ppltrst.1) = c("intercept", "min", "max")
@@ -762,7 +762,7 @@ gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
 gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='People being fair among 2nd generation by CIVIX in EU-15', fig.height=3}
 
 pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(pplfair.1) = c("intercept", "min", "max")
