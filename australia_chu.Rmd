@@ -210,7 +210,7 @@ poli.l.3 = lm(poli ~ age +  gender + edu, data = l.civix.sec) # absolute level
 poli.l.4 = lm(poli.gap ~ age +  gender + edu, data = l.civix.sec) # absolute level
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interest by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interest by CIVIX (Non-EU)', fig.height=1.5}
 absolute.h = as.vector(c(poli.h.1$coefficients[1],confint(poli.h.1)[1,]))
 absolute.l = as.vector(c(poli.l.1$coefficients[1],confint(poli.l.1)[1,]))
 
@@ -241,7 +241,7 @@ ggplot(poli.1,aes(y=var)) +
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interest among 2nd generation by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interest among 2nd generation by CIVIX (Non-EU)', fig.height=1.5}
 
 poli.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
 colnames(poli.2) = c("intercept", "min", "max")
@@ -271,7 +271,7 @@ trust1.l.3 = glm(trust1 ~ age + gender + edu, data = l.civix.sec, family = binom
 trust1.l.4 = lm(trust1.gap ~ age + gender + edu, data = l.civix.sec)# gap
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX (Non-EU)', fig.height=1.5}
 absolute.h = as.vector(c(trust1.h.1$coefficients[1],confint(trust1.h.1)[1,]))
 absolute.l = as.vector(c(trust1.l.1$coefficients[1],confint(trust1.l.1)[1,]))
 
@@ -302,7 +302,7 @@ ggplot(trust1.1,aes(y=var)) +
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust among 2nd generation by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust among 2nd generation by CIVIX (Non-EU)', fig.height=1.5}
 
 trust1.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
 colnames(trust1.2) = c("intercept", "min", "max")
@@ -312,7 +312,7 @@ trust1.2$var = factor(trust1.2$var, as.character(trust1.2$var))
 ggplot(trust1.2,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-10, 10)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -332,7 +332,7 @@ trust2.l.3 = lm(trust2 ~ age + gender + edu, data = l.civix.sec) # absolute leve
 trust2.l.4 = lm(trust2.gap ~ age + gender + edu, data = l.civix.sec)# gap
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Whether people are fair by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Whether people are fair by CIVIX (Non-EU)', fig.height=1.5}
 absolute.h = as.vector(c(trust2.h.1$coefficients[1],confint(trust2.h.1)[1,]))
 absolute.l = as.vector(c(trust2.l.1$coefficients[1],confint(trust2.l.1)[1,]))
 
@@ -363,7 +363,7 @@ ggplot(trust2.1,aes(y=var)) +
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Whether people are fair among 2nd generation by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Whether people are fair among 2nd generation by CIVIX (Non-EU)', fig.height=1.5}
 
 trust2.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
 colnames(trust2.2) = c("intercept", "min", "max")
@@ -393,7 +393,7 @@ income.l.3 = lm(income ~ age + gender + edu, data = l.civix.sec) # absolute leve
 income.l.4 = lm(income.gap ~ age + gender + edu, data = l.civix.sec)# gap
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Household income by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Household income by CIVIX (Non-EU)', fig.height=1.5}
 absolute.h = as.vector(c(income.h.1$coefficients[1],confint(income.h.1)[1,]))
 absolute.l = as.vector(c(income.l.1$coefficients[1],confint(income.l.1)[1,]))
 
@@ -424,7 +424,7 @@ ggplot(income.1,aes(y=var)) +
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Household income among 2nd generation by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Household income among 2nd generation by CIVIX (Non-EU)', fig.height=1.5}
 
 income.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
 colnames(income.2) = c("intercept", "min", "max")
@@ -454,7 +454,7 @@ employment.l.3 = glm(employment ~ age + gender + edu, data = l.civix.sec, family
 employment.l.4 = lm(employment.gap ~ age + gender + edu, data = l.civix.sec)# gap
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Employment status by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Employment status by CIVIX (Non-EU)', fig.height=1.5}
 absolute.h = as.vector(c(employment.h.1$coefficients[1],confint(employment.h.1)[1,]))
 absolute.l = as.vector(c(employment.l.1$coefficients[1],confint(employment.l.1)[1,]))
 
@@ -485,7 +485,7 @@ ggplot(employment.1,aes(y=var)) +
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Employment status among 2nd generation by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Employment status among 2nd generation by CIVIX (Non-EU)', fig.height=1.5}
 
 employment.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
 colnames(employment.2) = c("intercept", "min", "max")
@@ -495,7 +495,7 @@ employment.2$var = factor(employment.2$var, as.character(employment.2$var))
 ggplot(employment.2,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-10, 10)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -515,7 +515,7 @@ financial.l.3 = lm(financial ~ age + gender + edu, data = l.civix.sec) # absolut
 financial.l.4 = lm(finan.gap ~ age + gender + edu, data = l.civix.sec)# gap
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX (Non-EU)', fig.height=1.5}
 absolute.h = as.vector(c(financial.h.1$coefficients[1],confint(financial.h.1)[1,]))
 absolute.l = as.vector(c(financial.l.1$coefficients[1],confint(financial.l.1)[1,]))
 
@@ -546,7 +546,7 @@ ggplot(financial.1,aes(y=var)) +
 ```
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX (Non-EU)', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX (Non-EU)', fig.height=1.5}
 
 financial.2 = as.data.frame(rbind(absolute.h.sec, absolute.l.sec, gap.h.sec, gap.l.sec))
 colnames(financial.2) = c("intercept", "min", "max")
@@ -691,7 +691,7 @@ gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
 
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in EU-15', fig.height=1.5}
 
 polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(polintr.1) = c("intercept", "min", "max")
@@ -723,7 +723,7 @@ gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
 
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in EU-15', fig.height=1.5}
 
 hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(hincfel.1) = c("intercept", "min", "max")
@@ -733,7 +733,7 @@ hincfel.1$var = factor(hincfel.1$var, as.character(hincfel.1$var))
 ggplot(hincfel.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-10, 10)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -753,7 +753,7 @@ gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
 gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Unemployment by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Unemployment by CIVIX in EU-15', fig.height=1.5}
 employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(employ.1) = c("intercept", "min", "max")
 employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
@@ -782,7 +782,7 @@ gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
 gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in EU-15', fig.height=1.5}
 
 ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(ppltrst.1) = c("intercept", "min", "max")
@@ -812,7 +812,7 @@ gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
 gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in EU-15', fig.height=1.5}
 
 pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(pplfair.1) = c("intercept", "min", "max")
@@ -846,7 +846,7 @@ gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
 
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interests among 2nd generation by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Political interests among 2nd generation by CIVIX in EU-15', fig.height=1.5}
 
 polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(polintr.1) = c("intercept", "min", "max")
@@ -878,7 +878,7 @@ gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
 
 
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Financial situation among 2nd generation by CIVIX in EU-15', fig.height=1.5}
 
 hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(hincfel.1) = c("intercept", "min", "max")
@@ -908,7 +908,7 @@ gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
 gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Unemployment among 2nd generation by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Unemployment among 2nd generation by CIVIX in EU-15', fig.height=1.5}
 employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(employ.1) = c("intercept", "min", "max")
 employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
@@ -937,7 +937,7 @@ gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
 gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust among 2nd generation by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='General trust among 2nd generation by CIVIX in EU-15', fig.height=1.5}
 
 ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(ppltrst.1) = c("intercept", "min", "max")
@@ -947,7 +947,7 @@ ppltrst.1$var = factor(ppltrst.1$var, as.character(ppltrst.1$var))
 ggplot(ppltrst.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-10, 10)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -967,7 +967,7 @@ gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
 gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
 ```
 
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='People being fair among 2nd generation by CIVIX in EU-15', fig.height=3}
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='People being fair among 2nd generation by CIVIX in EU-15', fig.height=1.5}
 
 pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(pplfair.1) = c("intercept", "min", "max")
