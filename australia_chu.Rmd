@@ -656,10 +656,10 @@ ess_l.sec.immi = ess_l.sec.immi %>% mutate(
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # absolute level
-polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # gap
-polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # absolute level
-polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # gap
+polintr.h.1 = plm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi, index = "essround", model = "within") # absolute level
+polintr.h.2 = plm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi, index = "essround", model = "within") # gap
+polintr.l.1 = plm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi, index = "essround", model = "within") # absolute level
+polintr.l.2 = plm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi, index = "essround", model = "within") # gap
 
 absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
 absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
