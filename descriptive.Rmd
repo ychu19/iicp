@@ -1,0 +1,20 @@
+---
+title: "IICP: Descriptive Analysis"
+author: "Yuan-Ning Chu"
+date: "10/27/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Who Are the Immigrants?
+
+### Replicating Goodman and Wright (2015) with different definition of `immigrants'
+```{r}
+
+```
+
