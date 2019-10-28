@@ -656,10 +656,10 @@ ess_l.sec.immi = ess_l.sec.immi %>% mutate(
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-polintr.h.1 = plm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi, index = "essround", model = "within") # absolute level
-polintr.h.2 = plm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi, index = "essround", model = "within") # gap
-polintr.l.1 = plm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi, index = "essround", model = "within") # absolute level
-polintr.l.2 = plm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi, index = "essround", model = "within") # gap
+polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # absolute level
+polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # gap
+polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # absolute level
+polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # gap
 
 absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
 absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
@@ -680,7 +680,7 @@ polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
 ggplot(polintr.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-10, 10)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -688,10 +688,10 @@ ggplot(polintr.1,aes(y=var)) +
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # absolute level
-hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # gap
-hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # absolute level
-hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # gap
+hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # absolute level
+hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # gap
+hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # absolute level
+hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # gap
 
 absolute.h = as.vector(c(hincfel.h.1$coefficients[1],confint(hincfel.h.1)[1,]))
 absolute.l = as.vector(c(hincfel.l.1$coefficients[1],confint(hincfel.l.1)[1,]))
@@ -720,10 +720,10 @@ ggplot(hincfel.1,aes(y=var)) +
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # absolute level
-ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # gap
-ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # absolute level
-ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # gap
+ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # absolute level
+ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # gap
+ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # absolute level
+ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # gap
 
 absolute.h = as.vector(c(ppltrst.h.1$coefficients[1],confint(ppltrst.h.1)[1,]))
 absolute.l = as.vector(c(ppltrst.l.1$coefficients[1],confint(ppltrst.l.1)[1,]))
@@ -750,10 +750,10 @@ ggplot(ppltrst.1,aes(y=var)) +
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # absolute level
-pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + birthplace, data = ess_h.sec.immi) # gap
-pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # absolute level
-pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + birthplace, data = ess_l.sec.immi) # gap
+pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # absolute level
+pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # gap
+pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # absolute level
+pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # gap
 
 absolute.h = as.vector(c(pplfair.h.1$coefficients[1],confint(pplfair.h.1)[1,]))
 absolute.l = as.vector(c(pplfair.l.1$coefficients[1],confint(pplfair.l.1)[1,]))
