@@ -70,7 +70,7 @@ dat$income = ifelse(dat$`V239: Scale of incomes` > 0, dat$`V239: Scale of income
 
 # DV: employment
 dat$employment = ifelse(dat$`V229: Employment status` == 1, 1, 
-                        ifelse(dat$`V229: Employment status` == 2, 0, NA)) # 1 = employed, 2 = unemployed, -1 = others
+                        ifelse(dat$`V229: Employment status` == 2, 0, NA)) # 1 = employed, 0 = unemployed
 
 # DV: subjective financial situation
 dat$financial = ifelse(dat$`V237: Family savings during past year`> 0, dat$`V237: Family savings during past year`, NA) 
@@ -613,11 +613,12 @@ ess_raw$polintr = ifelse(ess_raw$polintr > 4, NA, ess_raw$polintr)
 ess_raw$hincfel = ifelse(ess_raw$hincfel > 4, NA, ess_raw$hincfel)
 ess_raw$ppltrst = ifelse(ess_raw$ppltrst > 10, NA, ess_raw$ppltrst)
 ess_raw$pplfair = ifelse(ess_raw$pplfair > 10, NA, ess_raw$pplfair)
+ess_raw$employ = ifelse(ess_raw$uempla == 0, 1, 0) # 1 = employed, 0 = unemployed
 
 ess_mean = ess_raw %>% filter(citizen == 1) %>% group_by(cntry) %>%
-  select(cntry,polintr, hincfel, uempla, ppltrst, pplfair) %>%
+  select(cntry,polintr, hincfel, employ, ppltrst, pplfair) %>%
   summarise(mean.poli = mean(polintr, na.rm = TRUE),
-            mean.uempla = mean(uempla, na.rm = TRUE),
+            mean.employ = mean(employ, na.rm = TRUE),
             mean.hincfel = mean(hincfel, na.rm = TRUE),
             mean.ppltrst = mean(ppltrst, na.rm = TRUE),
             mean.pplfair = mean(pplfair, na.rm = TRUE))
@@ -639,7 +640,7 @@ ess_l.sec.immi = ess_sec.immi %>% filter(cntry %in% c("IE", "SE", "BE", "PT", "E
 
 ess_h.sec.immi = ess_h.sec.immi %>% mutate(
   poli.gap = polintr - mean.poli, 
-  uempla.gap = uempla - mean.uempla,
+  employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
   pplfair.gap = pplfair - mean.pplfair
@@ -647,7 +648,7 @@ ess_h.sec.immi = ess_h.sec.immi %>% mutate(
 
 ess_l.sec.immi = ess_l.sec.immi %>% mutate(
   poli.gap = polintr - mean.poli, 
-  uempla.gap = uempla - mean.uempla,
+  employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
   pplfair.gap = pplfair - mean.pplfair
@@ -718,6 +719,35 @@ ggplot(hincfel.1,aes(y=var)) +
 
 
 ```
+
+```{r, message=FALSE, warning=FALSE}
+employ.h.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi, family = binomial(link = "logit")) # absolute level
+employ.h.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # gap
+employ.l.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi, family = binomial(link = "logit")) # absolute level
+employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.sec.immi) # gap
+
+absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
+gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='Unemployment among 2nd generation by CIVIX in EU-15', fig.height=3}
+employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employ.1) = c("intercept", "min", "max")
+employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employ.1$var = factor(employ.1$var, as.character(employ.1$var))
+
+ggplot(employ.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = ess_h.sec.immi) # absolute level
