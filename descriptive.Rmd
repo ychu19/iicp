@@ -29,16 +29,16 @@ ess_2010 = haven::read_stata("ESS5e03_4.dta")
 
 ```{r ess_yr, echo=TRUE, message=FALSE, warning=FALSE}
 ess_2002 = ess_2002 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair) %>%
   plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
 ess_2004 = ess_2004 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair) %>%
   plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
 ess_2006 = ess_2006 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair) %>%
   plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
 ess_2008 = ess_2008 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair) %>%
   plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
 ess_2010 = ess_2010 %>% 
   select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair) %>%
@@ -49,6 +49,8 @@ ess_2010$livecntr = ifelse(ess_2010$livecntr >= 1, 1,
                                   ifelse(ess_2010$livecntr %in% c(-6:-10), 3,
                                          ifelse(ess_2010$livecntr %in% c(-11:-20), 4,
                                                 ifelse(ess_2010$livecntr < -20, 5, NA)))))
+ess_2010$polcmpl = NA
+ess_2010$poldcs = NA
 ```
 
 ```{r ess_civix, echo=TRUE, message=FALSE, warning=FALSE}
@@ -69,18 +71,27 @@ ess_raw$edu = ifelse(ess_raw$edu > 5, NA, ess_raw$edu)
 ess_raw$fborn = ifelse(ess_raw$fborn == 1, 0, 1) # now 1 as foreign born, 0 as native born
 
 ess_raw$polintr = ifelse(ess_raw$polintr > 4, NA, ess_raw$polintr)
+# table(ess_raw$polcmpl) whether politics are too complicated to understand, 5 as always, 1 as never
+# table(ess_raw$poldcs) how difficult it is to make mind up about political issues, 5 as very easy, 1 as very difficult
+ess_raw$poldcs = ifelse(ess_raw$poldcs == 5, 1, 
+                        ifelse(ess_raw$poldcs == 4, 2, 
+                               ifelse(ess_raw$poldcs == 3, 3, 
+                                      ifelse(ess_raw$poldcs == 2, 4, 
+                                             ifelse(ess_raw$poldcs == 1, 5, ess_raw$poldcs)))))
 ess_raw$hincfel = ifelse(ess_raw$hincfel > 4, NA, ess_raw$hincfel)
 ess_raw$ppltrst = ifelse(ess_raw$ppltrst > 10, NA, ess_raw$ppltrst) # 0 as can't be too careful, 10 as most people can be trusted
 ess_raw$pplfair = ifelse(ess_raw$pplfair > 10, NA, ess_raw$pplfair) # 0 as most people take advantage, 10 as most people are fair
 ess_raw$employ = ifelse(ess_raw$uempla == 0, 1, 0) # 1 = employed, 0 = unemployed
 
 ess_mean = ess_raw %>% filter(citizen == 1, fborn == 0) %>% group_by(cntry) %>% 
-  select(cntry,polintr, hincfel, employ, ppltrst, pplfair) %>%
+  select(cntry,polintr, hincfel, employ, ppltrst, pplfair, polcmpl, poldcs) %>%
   summarise(mean.poli = mean(polintr, na.rm = TRUE),
             mean.employ = mean(employ, na.rm = TRUE),
             mean.hincfel = mean(hincfel, na.rm = TRUE),
             mean.ppltrst = mean(ppltrst, na.rm = TRUE),
-            mean.pplfair = mean(pplfair, na.rm = TRUE))
+            mean.pplfair = mean(pplfair, na.rm = TRUE),
+            mean.polcmpl = mean(polcmpl, na.rm = TRUE),
+            mean.poldcs = mean(poldcs, na.rm = TRUE))
 
 # ess_mean = ess_raw %>% filter(citizen == 1) %>% group_by(cntry) %>% 
 #   select(cntry,polintr, hincfel, employ, ppltrst, pplfair) %>%
@@ -119,7 +130,9 @@ ess_h.nonciti = ess_h.nonciti %>% mutate(
   employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
   )
 
 ess_l.nonciti = ess_l.nonciti %>% mutate(
@@ -127,7 +140,9 @@ ess_l.nonciti = ess_l.nonciti %>% mutate(
   employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
   )
 
 ess_h.tenyr = ess_h.tenyr %>% mutate(
@@ -143,7 +158,9 @@ ess_l.tenyr = ess_l.tenyr %>% mutate(
   employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
   )
 
 ess_l.fborn = ess_l.fborn %>% mutate(
@@ -151,7 +168,9 @@ ess_l.fborn = ess_l.fborn %>% mutate(
   employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
   )
 
 ess_h.fborn = ess_h.fborn %>% mutate(
@@ -159,7 +178,9 @@ ess_h.fborn = ess_h.fborn %>% mutate(
   employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
   )
 
 ```
@@ -172,6 +193,43 @@ polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_h.
 polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.nonciti) # gap
 polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = ess_l.nonciti) # absolute level
 polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.nonciti) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
+absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+
+gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
+gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in EU-15 among Non-citizens', fig.height=1.5}
+
+polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polintr.1) = c("intercept", "min", "max")
+polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+
+ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = ess_h.nonciti) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.nonciti) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = ess_l.nonciti) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.nonciti) # gap
 
 # length(polintr.h.1$residuals) 1803
 # length(polintr.h.2$residuals) 1803
