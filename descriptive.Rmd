@@ -111,7 +111,6 @@ ess_nonciti = ess_nonciti %>% left_join(ess_mean, by='cntry')
 ess_tenyr = ess_tenyr %>% left_join(ess_mean, by='cntry')
 ess_fborn = ess_fborn %>% left_join(ess_mean, by='cntry')
 
-
 ess_h.nonciti = ess_nonciti %>% filter(cntry %in% c("DK", "NL", "DE", "AT", "FR", "GB", "GR"))
 ess_l.nonciti = ess_nonciti %>% filter(cntry %in% c("IE", "SE", "BE", "PT", "ES", "FI","LU", "IT"))
 
@@ -150,7 +149,9 @@ ess_h.tenyr = ess_h.tenyr %>% mutate(
   employ.gap = employ - mean.employ,
   hincfel.gap = hincfel - mean.hincfel, 
   ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
   )
 
 ess_l.tenyr = ess_l.tenyr %>% mutate(
@@ -235,23 +236,59 @@ polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = es
 # length(polintr.h.2$residuals) 1803
 # length(polintr.l.1$residuals) 2659
 
-absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
-absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
 
-gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
-gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
 ```
 
 
 
-```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in EU-15 among Non-citizens', fig.height=1.5}
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in EU-15 among Non-citizens', fig.height=1.5}
 
-polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
-colnames(polintr.1) = c("intercept", "min", "max")
-polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
-polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
 
-ggplot(polintr.1,aes(y=var)) + 
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_h.nonciti) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.nonciti) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_l.nonciti) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.nonciti) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in EU-15 among Non-citizens', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
   coord_cartesian(xlim = c(-5, 5)) + 
@@ -403,8 +440,6 @@ gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
 gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
 ```
 
-
-
 ```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in EU-15, < 10 yrs', fig.height=1.5}
 
 polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
@@ -413,6 +448,78 @@ polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVI
 polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
 
 ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in EU-15, < 10 yrs', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in EU-15, < 10 yrs', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
   coord_cartesian(xlim = c(-5, 5)) + 
@@ -585,6 +692,79 @@ ggplot(polintr.1,aes(y=var)) +
 ```
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = ess_h.fborn) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.fborn) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = ess_l.fborn) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.fborn) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in EU-15, foreign-borns', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_h.fborn) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.fborn) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_l.fborn) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.fborn) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in EU-15, foreign-borns', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
 hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = ess_h.fborn) # absolute level
 hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.fborn) # gap
 hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = ess_l.fborn) # absolute level
@@ -710,4 +890,1578 @@ ggplot(pplfair.1,aes(y=var)) +
   coord_cartesian(xlim = c(-10, 10)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
+```
+
+## Thinking about birthright citizenship
+
+```{r birthright, echo=TRUE, message=FALSE, warning=FALSE}
+list.cntry = as.vector(unique(ess_raw$cntry))
+birthright = c("GB", "PT", "DE", "BE", "DK", "FR", "NL")
+no.birthright = list.cntry[!list.cntry %in% birthright]
+
+h.civix = c("DK", "NL", "DE", "AT", "FR", "GB", "GR")
+l.civix = c("IE", "SE", "BE", "PT", "ES", "FI","LU", "IT")
+
+```
+
+### With birthright citizenship
+
+```{r}
+b.h = birthright[birthright %in% h.civix]
+b.l = birthright[birthright %in% l.civix]
+
+dat.b.h = ess_raw %>% filter(cntry %in% b.h)
+dat.b.h = dat.b.h %>% left_join(ess_mean, by='cntry')
+dat.b.l = ess_raw %>% filter(cntry %in% b.l)
+dat.b.l = dat.b.l %>% left_join(ess_mean, by='cntry')
+
+dat.b.h.nonciti = dat.b.h %>% filter(citizen == 0)
+dat.b.h.tenyr = dat.b.h %>% filter(residence == 1)
+dat.b.h.fborn = dat.b.h %>% filter(fborn == 1) 
+
+dat.b.l.nonciti = dat.b.l %>% filter(citizen == 0)
+dat.b.l.tenyr = dat.b.l %>% filter(residence == 1)
+dat.b.l.fborn = dat.b.l %>% filter(fborn == 1) 
+
+dat.b.h.nonciti = dat.b.h.nonciti %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.b.l.nonciti = dat.b.l.nonciti %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.b.h.tenyr = dat.b.h.tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.b.l.tenyr = dat.b.l.tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.b.h.fborn = dat.b.h.fborn %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.b.l.fborn = dat.b.l.fborn %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.tenyr) # absolute level
+polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.tenyr) # gap
+polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.tenyr) # absolute level
+polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.tenyr) # gap
+
+absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
+absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+
+gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
+gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in countries with birthright citizenship, < 10 yrs', fig.height=1.5}
+
+polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polintr.1) = c("intercept", "min", "max")
+polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+
+ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.tenyr) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.tenyr) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.tenyr) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.tenyr) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in countries with birthright citizenship, < 10 yrs', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in countries with birthright citizenship, < 10 yrs', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # absolute level
+hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # gap
+hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # absolute level
+hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # gap
+
+# length(hincfel.h.1$residuals) 1187
+# length(hincfel.l.1$residuals) 1622
+
+absolute.h = as.vector(c(hincfel.h.1$coefficients[1],confint(hincfel.h.1)[1,]))
+absolute.l = as.vector(c(hincfel.l.1$coefficients[1],confint(hincfel.l.1)[1,]))
+
+gap.h = as.vector(c(hincfel.h.2$coefficients[1],confint(hincfel.h.2)[1,]))
+gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in countries with birthright citizenship, < 10 yrs', fig.height=1.5}
+
+hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(hincfel.1) = c("intercept", "min", "max")
+hincfel.1 = hincfel.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+hincfel.1$var = factor(hincfel.1$var, as.character(hincfel.1$var))
+
+ggplot(hincfel.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+employ.h.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr, family = binomial(link = "logit")) # absolute level
+employ.h.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # gap
+employ.l.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr, family = binomial(link = "logit")) # absolute level
+employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # gap
+
+# length(employ.h.1$residuals) 1238
+# length(employ.l.1$residuals) 1646
+
+absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
+gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Employment by CIVIX in countries with birthright citizenship, < 10 yrs', fig.height=1.5}
+employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employ.1) = c("intercept", "min", "max")
+employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employ.1$var = factor(employ.1$var, as.character(employ.1$var))
+
+ggplot(employ.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # absolute level
+ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # gap
+ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # absolute level
+ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # gap
+
+# length(ppltrst.h.1$residuals) 1231
+# length(ppltrst.l.1$residuals) 1632
+
+absolute.h = as.vector(c(ppltrst.h.1$coefficients[1],confint(ppltrst.h.1)[1,]))
+absolute.l = as.vector(c(ppltrst.l.1$coefficients[1],confint(ppltrst.l.1)[1,]))
+
+gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
+gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in countries with birthright citizenship, < 10 yrs', fig.height=1.5}
+
+ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(ppltrst.1) = c("intercept", "min", "max")
+ppltrst.1 = ppltrst.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+ppltrst.1$var = factor(ppltrst.1$var, as.character(ppltrst.1$var))
+
+ggplot(ppltrst.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # absolute level
+pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = ess_h.tenyr) # gap
+pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # absolute level
+pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = ess_l.tenyr) # gap
+
+absolute.h = as.vector(c(pplfair.h.1$coefficients[1],confint(pplfair.h.1)[1,]))
+absolute.l = as.vector(c(pplfair.l.1$coefficients[1],confint(pplfair.l.1)[1,]))
+
+gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
+gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in countries with birthright citizenship, < 10 yrs', fig.height=1.5}
+
+pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(pplfair.1) = c("intercept", "min", "max")
+pplfair.1 = pplfair.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+pplfair.1$var = factor(pplfair.1$var, as.character(pplfair.1$var))
+
+ggplot(pplfair.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+```
+
+
+
+#### Non-citizens
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # absolute level
+polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # gap
+polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # absolute level
+polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # gap
+
+absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
+absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+
+gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
+gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in countries with birthright citizenship, noncitizens', fig.height=1.5}
+
+polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polintr.1) = c("intercept", "min", "max")
+polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+
+ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in countries with birthright citizenship, noncitizens', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in countries with birthright citizenship, noncitizens', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # absolute level
+hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # gap
+hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # absolute level
+hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # gap
+
+# length(hincfel.h.1$residuals) 1187
+# length(hincfel.l.1$residuals) 1622
+
+absolute.h = as.vector(c(hincfel.h.1$coefficients[1],confint(hincfel.h.1)[1,]))
+absolute.l = as.vector(c(hincfel.l.1$coefficients[1],confint(hincfel.l.1)[1,]))
+
+gap.h = as.vector(c(hincfel.h.2$coefficients[1],confint(hincfel.h.2)[1,]))
+gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in countries with birthright citizenship, noncitizens', fig.height=1.5}
+
+hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(hincfel.1) = c("intercept", "min", "max")
+hincfel.1 = hincfel.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+hincfel.1$var = factor(hincfel.1$var, as.character(hincfel.1$var))
+
+ggplot(hincfel.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+employ.h.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti, family = binomial(link = "logit")) # absolute level
+employ.h.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # gap
+employ.l.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti, family = binomial(link = "logit")) # absolute level
+employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # gap
+
+# length(employ.h.1$residuals) 1238
+# length(employ.l.1$residuals) 1646
+
+absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
+gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Employment by CIVIX in countries with birthright citizenship, noncitizens', fig.height=1.5}
+employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employ.1) = c("intercept", "min", "max")
+employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employ.1$var = factor(employ.1$var, as.character(employ.1$var))
+
+ggplot(employ.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # absolute level
+ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # gap
+ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # absolute level
+ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # gap
+
+# length(ppltrst.h.1$residuals) 1231
+# length(ppltrst.l.1$residuals) 1632
+
+absolute.h = as.vector(c(ppltrst.h.1$coefficients[1],confint(ppltrst.h.1)[1,]))
+absolute.l = as.vector(c(ppltrst.l.1$coefficients[1],confint(ppltrst.l.1)[1,]))
+
+gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
+gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in countries with birthright citizenship, noncitizens', fig.height=1.5}
+
+ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(ppltrst.1) = c("intercept", "min", "max")
+ppltrst.1 = ppltrst.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+ppltrst.1$var = factor(ppltrst.1$var, as.character(ppltrst.1$var))
+
+ggplot(ppltrst.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # absolute level
+pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.nonciti) # gap
+pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # absolute level
+pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.nonciti) # gap
+
+absolute.h = as.vector(c(pplfair.h.1$coefficients[1],confint(pplfair.h.1)[1,]))
+absolute.l = as.vector(c(pplfair.l.1$coefficients[1],confint(pplfair.l.1)[1,]))
+
+gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
+gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in countries with birthright citizenship, noncitizens', fig.height=1.5}
+
+pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(pplfair.1) = c("intercept", "min", "max")
+pplfair.1 = pplfair.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+pplfair.1$var = factor(pplfair.1$var, as.character(pplfair.1$var))
+
+ggplot(pplfair.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+```
+
+
+
+#### Foreign-borns
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # absolute level
+polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # gap
+polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # absolute level
+polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # gap
+
+absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
+absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+
+gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
+gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in countries with birthright citizenship, foreign-borns', fig.height=1.5}
+
+polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polintr.1) = c("intercept", "min", "max")
+polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+
+ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in countries with birthright citizenship, foreign-borns', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in countries with birthright citizenship, foreign-brons', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # absolute level
+hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # gap
+hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # absolute level
+hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # gap
+
+# length(hincfel.h.1$residuals) 1187
+# length(hincfel.l.1$residuals) 1622
+
+absolute.h = as.vector(c(hincfel.h.1$coefficients[1],confint(hincfel.h.1)[1,]))
+absolute.l = as.vector(c(hincfel.l.1$coefficients[1],confint(hincfel.l.1)[1,]))
+
+gap.h = as.vector(c(hincfel.h.2$coefficients[1],confint(hincfel.h.2)[1,]))
+gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in countries with birthright citizenship, foreign-borns', fig.height=1.5}
+
+hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(hincfel.1) = c("intercept", "min", "max")
+hincfel.1 = hincfel.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+hincfel.1$var = factor(hincfel.1$var, as.character(hincfel.1$var))
+
+ggplot(hincfel.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+employ.h.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn, family = binomial(link = "logit")) # absolute level
+employ.h.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # gap
+employ.l.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn, family = binomial(link = "logit")) # absolute level
+employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # gap
+
+# length(employ.h.1$residuals) 1238
+# length(employ.l.1$residuals) 1646
+
+absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
+gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Employment by CIVIX in countries with birthright citizenship, foreign-borns', fig.height=1.5}
+employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employ.1) = c("intercept", "min", "max")
+employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employ.1$var = factor(employ.1$var, as.character(employ.1$var))
+
+ggplot(employ.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # absolute level
+ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # gap
+ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # absolute level
+ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # gap
+
+# length(ppltrst.h.1$residuals) 1231
+# length(ppltrst.l.1$residuals) 1632
+
+absolute.h = as.vector(c(ppltrst.h.1$coefficients[1],confint(ppltrst.h.1)[1,]))
+absolute.l = as.vector(c(ppltrst.l.1$coefficients[1],confint(ppltrst.l.1)[1,]))
+
+gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
+gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in countries with birthright citizenship, foreign-borns', fig.height=1.5}
+
+ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(ppltrst.1) = c("intercept", "min", "max")
+ppltrst.1 = ppltrst.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+ppltrst.1$var = factor(ppltrst.1$var, as.character(ppltrst.1$var))
+
+ggplot(ppltrst.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # absolute level
+pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.h.fborn) # gap
+pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # absolute level
+pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.b.l.fborn) # gap
+
+absolute.h = as.vector(c(pplfair.h.1$coefficients[1],confint(pplfair.h.1)[1,]))
+absolute.l = as.vector(c(pplfair.l.1$coefficients[1],confint(pplfair.l.1)[1,]))
+
+gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
+gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in countries with birthright citizenship, foreign-borns', fig.height=1.5}
+
+pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(pplfair.1) = c("intercept", "min", "max")
+pplfair.1 = pplfair.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+pplfair.1$var = factor(pplfair.1$var, as.character(pplfair.1$var))
+
+ggplot(pplfair.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+```
+
+
+
+### W/o birthright citizenship
+
+```{r}
+n.b.h = no.birthright[no.birthright %in% h.civix]
+n.b.l = no.birthright[no.birthright %in% l.civix]
+
+dat.n.b.h = ess_raw %>% filter(cntry %in% n.b.h)
+dat.n.b.h = dat.n.b.h %>% left_join(ess_mean, by='cntry')
+dat.n.b.l = ess_raw %>% filter(cntry %in% n.b.l)
+dat.n.b.l = dat.n.b.l %>% left_join(ess_mean, by='cntry')
+
+dat.n.b.h.nonciti = dat.n.b.h %>% filter(citizen == 0)
+dat.n.b.h.tenyr = dat.n.b.h %>% filter(residence == 1)
+dat.n.b.h.fborn = dat.n.b.h %>% filter(fborn == 1) 
+
+dat.n.b.l.nonciti = dat.n.b.l %>% filter(citizen == 0)
+dat.n.b.l.tenyr = dat.n.b.l %>% filter(residence == 1)
+dat.n.b.l.fborn = dat.n.b.l %>% filter(fborn == 1) 
+
+dat.n.b.h.nonciti = dat.n.b.h.nonciti %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.n.b.l.nonciti = dat.n.b.l.nonciti %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.n.b.h.tenyr = dat.n.b.h.tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.n.b.l.tenyr = dat.n.b.l.tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.n.b.h.fborn = dat.n.b.h.fborn %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+dat.n.b.l.fborn = dat.n.b.l.fborn %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+```
+
+#### Ten-year residence
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # absolute level
+polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # gap
+polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # absolute level
+polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # gap
+
+absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
+absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+
+gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
+gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in countries w/o birthright citizenship, < 10 yrs', fig.height=1.5}
+
+polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polintr.1) = c("intercept", "min", "max")
+polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+
+ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in countries w/o birthright citizenship, < 10 yrs', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in countries w/o birthright citizenship, < 10 yrs', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # absolute level
+hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # gap
+hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # absolute level
+hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # gap
+
+# length(hincfel.h.1$residuals) 1187
+# length(hincfel.l.1$residuals) 1622
+
+absolute.h = as.vector(c(hincfel.h.1$coefficients[1],confint(hincfel.h.1)[1,]))
+absolute.l = as.vector(c(hincfel.l.1$coefficients[1],confint(hincfel.l.1)[1,]))
+
+gap.h = as.vector(c(hincfel.h.2$coefficients[1],confint(hincfel.h.2)[1,]))
+gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in countries w/o birthright citizenship, < 10 yrs', fig.height=1.5}
+
+hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(hincfel.1) = c("intercept", "min", "max")
+hincfel.1 = hincfel.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+hincfel.1$var = factor(hincfel.1$var, as.character(hincfel.1$var))
+
+ggplot(hincfel.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+employ.h.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr, family = binomial(link = "logit")) # absolute level
+employ.h.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # gap
+employ.l.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr, family = binomial(link = "logit")) # absolute level
+employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # gap
+
+# length(employ.h.1$residuals) 1238
+# length(employ.l.1$residuals) 1646
+
+absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
+gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Employment by CIVIX in countries w/o birthright citizenship, < 10 yrs', fig.height=1.5}
+employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employ.1) = c("intercept", "min", "max")
+employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employ.1$var = factor(employ.1$var, as.character(employ.1$var))
+
+ggplot(employ.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # absolute level
+ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # gap
+ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # absolute level
+ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # gap
+
+# length(ppltrst.h.1$residuals) 1231
+# length(ppltrst.l.1$residuals) 1632
+
+absolute.h = as.vector(c(ppltrst.h.1$coefficients[1],confint(ppltrst.h.1)[1,]))
+absolute.l = as.vector(c(ppltrst.l.1$coefficients[1],confint(ppltrst.l.1)[1,]))
+
+gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
+gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in countries w/o birthright citizenship, < 10 yrs', fig.height=1.5}
+
+ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(ppltrst.1) = c("intercept", "min", "max")
+ppltrst.1 = ppltrst.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+ppltrst.1$var = factor(ppltrst.1$var, as.character(ppltrst.1$var))
+
+ggplot(ppltrst.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # absolute level
+pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.tenyr) # gap
+pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # absolute level
+pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.tenyr) # gap
+
+absolute.h = as.vector(c(pplfair.h.1$coefficients[1],confint(pplfair.h.1)[1,]))
+absolute.l = as.vector(c(pplfair.l.1$coefficients[1],confint(pplfair.l.1)[1,]))
+
+gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
+gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in countries w/o birthright citizenship, < 10 yrs', fig.height=1.5}
+
+pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(pplfair.1) = c("intercept", "min", "max")
+pplfair.1 = pplfair.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+pplfair.1$var = factor(pplfair.1$var, as.character(pplfair.1$var))
+
+ggplot(pplfair.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+#### Non-citizens
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # absolute level
+polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # gap
+polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # absolute level
+polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # gap
+
+absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
+absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+
+gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
+gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in countries w/o birthright citizenship, noncitizens', fig.height=1.5}
+
+polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polintr.1) = c("intercept", "min", "max")
+polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+
+ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in countries w/o birthright citizenship, noncitizens', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in countries w/o birthright citizenship, noncitizens', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # absolute level
+hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # gap
+hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # absolute level
+hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # gap
+
+# length(hincfel.h.1$residuals) 1187
+# length(hincfel.l.1$residuals) 1622
+
+absolute.h = as.vector(c(hincfel.h.1$coefficients[1],confint(hincfel.h.1)[1,]))
+absolute.l = as.vector(c(hincfel.l.1$coefficients[1],confint(hincfel.l.1)[1,]))
+
+gap.h = as.vector(c(hincfel.h.2$coefficients[1],confint(hincfel.h.2)[1,]))
+gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in countries w/o birthright citizenship, noncitizens', fig.height=1.5}
+
+hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(hincfel.1) = c("intercept", "min", "max")
+hincfel.1 = hincfel.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+hincfel.1$var = factor(hincfel.1$var, as.character(hincfel.1$var))
+
+ggplot(hincfel.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+employ.h.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti, family = binomial(link = "logit")) # absolute level
+employ.h.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # gap
+employ.l.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti, family = binomial(link = "logit")) # absolute level
+employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # gap
+
+# length(employ.h.1$residuals) 1238
+# length(employ.l.1$residuals) 1646
+
+absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
+gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Employment by CIVIX in countries w/o birthright citizenship, noncitizens', fig.height=1.5}
+employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employ.1) = c("intercept", "min", "max")
+employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employ.1$var = factor(employ.1$var, as.character(employ.1$var))
+
+ggplot(employ.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # absolute level
+ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # gap
+ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # absolute level
+ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # gap
+
+# length(ppltrst.h.1$residuals) 1231
+# length(ppltrst.l.1$residuals) 1632
+
+absolute.h = as.vector(c(ppltrst.h.1$coefficients[1],confint(ppltrst.h.1)[1,]))
+absolute.l = as.vector(c(ppltrst.l.1$coefficients[1],confint(ppltrst.l.1)[1,]))
+
+gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
+gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in countries w/o birthright citizenship, noncitizens', fig.height=1.5}
+
+ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(ppltrst.1) = c("intercept", "min", "max")
+ppltrst.1 = ppltrst.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+ppltrst.1$var = factor(ppltrst.1$var, as.character(ppltrst.1$var))
+
+ggplot(ppltrst.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # absolute level
+pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.nonciti) # gap
+pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # absolute level
+pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.nonciti) # gap
+
+absolute.h = as.vector(c(pplfair.h.1$coefficients[1],confint(pplfair.h.1)[1,]))
+absolute.l = as.vector(c(pplfair.l.1$coefficients[1],confint(pplfair.l.1)[1,]))
+
+gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
+gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in countries w/o birthright citizenship, noncitizens', fig.height=1.5}
+
+pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(pplfair.1) = c("intercept", "min", "max")
+pplfair.1 = pplfair.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+pplfair.1$var = factor(pplfair.1$var, as.character(pplfair.1$var))
+
+ggplot(pplfair.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+#### Foreign-borns
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polintr.h.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # absolute level
+polintr.h.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # gap
+polintr.l.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # absolute level
+polintr.l.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # gap
+
+absolute.h = as.vector(c(polintr.h.1$coefficients[1],confint(polintr.h.1)[1,]))
+absolute.l = as.vector(c(polintr.l.1$coefficients[1],confint(polintr.l.1)[1,]))
+
+gap.h = as.vector(c(polintr.h.2$coefficients[1],confint(polintr.h.2)[1,]))
+gap.l = as.vector(c(polintr.l.2$coefficients[1],confint(polintr.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Political interests by CIVIX in countries w/o birthright citizenship, foreign-borns', fig.height=1.5}
+
+polintr.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polintr.1) = c("intercept", "min", "max")
+polintr.1 = polintr.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polintr.1$var = factor(polintr.1$var, as.character(polintr.1$var))
+
+ggplot(polintr.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+polcmpl.h.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # absolute level
+polcmpl.h.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # gap
+polcmpl.l.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # absolute level
+polcmpl.l.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(polcmpl.h.1$coefficients[1],confint(polcmpl.h.1)[1,]))
+absolute.l = as.vector(c(polcmpl.l.1$coefficients[1],confint(polcmpl.l.1)[1,]))
+
+gap.h = as.vector(c(polcmpl.h.2$coefficients[1],confint(polcmpl.h.2)[1,]))
+gap.l = as.vector(c(polcmpl.l.2$coefficients[1],confint(polcmpl.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Politics as complicated by CIVIX in countries w/o birthright citizenship, foreign-borns', fig.height=1.5}
+
+polcmpl.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(polcmpl.1) = c("intercept", "min", "max")
+polcmpl.1 = polcmpl.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+polcmpl.1$var = factor(polcmpl.1$var, as.character(polcmpl.1$var))
+
+ggplot(polcmpl.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+poldcs.h.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # absolute level
+poldcs.h.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # gap
+poldcs.l.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # absolute level
+poldcs.l.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # gap
+
+# length(polintr.h.1$residuals) 1803
+# length(polintr.h.2$residuals) 1803
+# length(polintr.l.1$residuals) 2659
+
+absolute.h = as.vector(c(poldcs.h.1$coefficients[1],confint(poldcs.h.1)[1,]))
+absolute.l = as.vector(c(poldcs.l.1$coefficients[1],confint(poldcs.l.1)[1,]))
+
+gap.h = as.vector(c(poldcs.h.2$coefficients[1],confint(poldcs.h.2)[1,]))
+gap.l = as.vector(c(poldcs.l.2$coefficients[1],confint(poldcs.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Difficulties in making political decisions by CIVIX in countries w/o birthright citizenship, foreign-borns', fig.height=1.5}
+
+poldcs.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(poldcs.1) = c("intercept", "min", "max")
+poldcs.1 = poldcs.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+poldcs.1$var = factor(poldcs.1$var, as.character(poldcs.1$var))
+
+ggplot(poldcs.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+hincfel.h.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # absolute level
+hincfel.h.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # gap
+hincfel.l.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # absolute level
+hincfel.l.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # gap
+
+# length(hincfel.h.1$residuals) 1187
+# length(hincfel.l.1$residuals) 1622
+
+absolute.h = as.vector(c(hincfel.h.1$coefficients[1],confint(hincfel.h.1)[1,]))
+absolute.l = as.vector(c(hincfel.l.1$coefficients[1],confint(hincfel.l.1)[1,]))
+
+gap.h = as.vector(c(hincfel.h.2$coefficients[1],confint(hincfel.h.2)[1,]))
+gap.l = as.vector(c(hincfel.l.2$coefficients[1],confint(hincfel.l.2)[1,]))
+```
+
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Financial situation by CIVIX in countries w/o birthright citizenship, foreign-borns', fig.height=1.5}
+
+hincfel.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(hincfel.1) = c("intercept", "min", "max")
+hincfel.1 = hincfel.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+hincfel.1$var = factor(hincfel.1$var, as.character(hincfel.1$var))
+
+ggplot(hincfel.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, message=FALSE, warning=FALSE}
+employ.h.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn, family = binomial(link = "logit")) # absolute level
+employ.h.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # gap
+employ.l.1 = glm(employ ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn, family = binomial(link = "logit")) # absolute level
+employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # gap
+
+# length(employ.h.1$residuals) 1238
+# length(employ.l.1$residuals) 1646
+
+absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
+gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='Employment by CIVIX in countries w/o birthright citizenship, foreign-borns', fig.height=1.5}
+employ.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(employ.1) = c("intercept", "min", "max")
+employ.1 = employ.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+employ.1$var = factor(employ.1$var, as.character(employ.1$var))
+
+ggplot(employ.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+```
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+ppltrst.h.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # absolute level
+ppltrst.h.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # gap
+ppltrst.l.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # absolute level
+ppltrst.l.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # gap
+
+# length(ppltrst.h.1$residuals) 1231
+# length(ppltrst.l.1$residuals) 1632
+
+absolute.h = as.vector(c(ppltrst.h.1$coefficients[1],confint(ppltrst.h.1)[1,]))
+absolute.l = as.vector(c(ppltrst.l.1$coefficients[1],confint(ppltrst.l.1)[1,]))
+
+gap.h = as.vector(c(ppltrst.h.2$coefficients[1],confint(ppltrst.h.2)[1,]))
+gap.l = as.vector(c(ppltrst.l.2$coefficients[1],confint(ppltrst.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='General trust by CIVIX in countries w/o birthright citizenship, foreign-borns', fig.height=1.5}
+
+ppltrst.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(ppltrst.1) = c("intercept", "min", "max")
+ppltrst.1 = ppltrst.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+ppltrst.1$var = factor(ppltrst.1$var, as.character(ppltrst.1$var))
+
+ggplot(ppltrst.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
+
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+pplfair.h.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # absolute level
+pplfair.h.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.h.fborn) # gap
+pplfair.l.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # absolute level
+pplfair.l.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth, data = dat.n.b.l.fborn) # gap
+
+absolute.h = as.vector(c(pplfair.h.1$coefficients[1],confint(pplfair.h.1)[1,]))
+absolute.l = as.vector(c(pplfair.l.1$coefficients[1],confint(pplfair.l.1)[1,]))
+
+gap.h = as.vector(c(pplfair.h.2$coefficients[1],confint(pplfair.h.2)[1,]))
+gap.l = as.vector(c(pplfair.l.2$coefficients[1],confint(pplfair.l.2)[1,]))
+```
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE, fig.cap='People being fair by CIVIX in countries w/o birthright citizenship, foreign-borns', fig.height=1.5}
+
+pplfair.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(pplfair.1) = c("intercept", "min", "max")
+pplfair.1 = pplfair.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+pplfair.1$var = factor(pplfair.1$var, as.character(pplfair.1$var))
+
+ggplot(pplfair.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-10, 10)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("")
+
 ```
