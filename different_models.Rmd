@@ -1,0 +1,883 @@
+---
+title: "Different models"
+author: "Yuan-Ning Chu"
+date: "1/3/2020"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plm) # fixed effect
+library(stargazer)
+library(ggplot2)
+```
+
+```{r ess, echo=TRUE, message=FALSE, warning=FALSE}
+ess_2002 = haven::read_stata("ESS1e06_6.dta")
+ess_2004 = haven::read_stata("ESS2e03_6.dta")
+ess_2006 = haven::read_stata("ESS3e03_7.dta")
+ess_2008 = haven::read_stata("ESS4e04_5.dta")
+ess_2010 = haven::read_stata("ESS5e03_4.dta")
+```
+
+```{r ess_yr, echo=TRUE, message=FALSE, warning=FALSE}
+ess_2002 = ess_2002 %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctr, jbspv, wkdcorg, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt, hincsrc, brwmny) %>%
+  plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn", "wrkctr"="wrkctra", "wkdcorg" = "wkdcorga", "hincsrc" = "hincsrca"))
+  ess_2002 = ess_2002 %>% mutate(hinctnt = hinctnt/12*10) # rescale to fit data from 2008 and 2010
+ess_2004 = ess_2004 %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt, hincsrca, brwmny) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
+  ess_2004 = ess_2004 %>% mutate(hinctnt = hinctnt/12*10)
+ess_2006 = ess_2006 %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt, hincsrca, brwmny) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
+  ess_2006 = ess_2006 %>% mutate(hinctnt = hinctnt/12*10)
+ess_2008 = ess_2008 %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnta, hincsrca, brwmny) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn", "hinctnta" = "hinctnt"))
+ess_2010 = ess_2010 %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghom1, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnta, hincsrca, brwmny) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvlb"="edu","livecnta" = "livecntr","brncntr"="fborn", "lnghom1"="lnghoma", "hinctnta" = "hinctnt"))
+ess_2010$livecntr = ess_2010$livecntr - 2010
+ess_2010$livecntr = ifelse(ess_2010$livecntr >= 1, 1,
+                           ifelse(ess_2010$livecntr %in% c(-1:-5), 2,
+                                  ifelse(ess_2010$livecntr %in% c(-6:-10), 3,
+                                         ifelse(ess_2010$livecntr %in% c(-11:-20), 4,
+                                                ifelse(ess_2010$livecntr < -20, 5, NA)))))
+ess_2010$polcmpl = NA
+ess_2010$poldcs = NA
+```
+
+```{r ess_civix, echo=TRUE, message=FALSE, warning=FALSE}
+ess_raw = rbind(ess_2002, ess_2004, ess_2006, ess_2008, ess_2010)
+ess_raw$sec.immi = ifelse(ess_raw$facntr == 2 | ess_raw$mocntr == 2, 1, 0)
+ess_raw$ethnic = ifelse(ess_raw$ethnic == 1, 1,
+                        ifelse(ess_raw$ethnic == 2, 0, NA))
+ess_raw$citizen = ifelse(ess_raw$ctzcntr == 1, 1,
+                         ifelse(ess_raw$ctzcntr == 2, 0, NA))
+ess_raw$residence = ifelse(ess_raw$livecntr <= 3, 1, 0) # 1 = lived less than 10 yrs, 0 = lived more than 10 yrs
+ess_raw$birthplace = ifelse(ess_raw$birthplace %in% c(66,77,88,99,"02","03","04","06"), NA, ess_raw$birthplace)
+  # ess_raw = ess_raw[complete.cases(ess_raw$birthplace),]
+  eu_member = c("BE", "FR", "DE", "IT", "LU", "NL", "DK", "IE", "GB", "GR", "PT", "ES","AT","SE")
+  ess_raw$eubirth = ifelse(ess_raw$birthplace %in% eu_member, 1, 0)
+ess_raw$female = ifelse(ess_raw$gndr == 2, 1, 
+                        ifelse(ess_raw$gndr == 1, 0, NA))
+ess_raw$edu = ifelse(ess_raw$edu > 5, NA, ess_raw$edu)
+ess_raw$fborn = ifelse(ess_raw$fborn == 1, 0, 1) # now 1 as foreign born, 0 as native born
+```
+
+
+# Playing with the models
+
+## Political Incorporation
+
+```{r}
+ess_raw$tvpol = ifelse(ess_raw$tvpol > 8, NA, ess_raw$tvpol)
+ess_raw$rdpol = ifelse(ess_raw$rdpol > 8, NA, ess_raw$rdpol)
+ess_raw$nwsppol = ifelse(ess_raw$nwsppol > 8, NA, ess_raw$nwsppol)
+
+ess_raw$contplt = ifelse(ess_raw$contplt == 2, 0, ess_raw$contplt)
+ess_raw$wrkprty = ifelse(ess_raw$wrkprty == 2, 0, ess_raw$wrkprty)
+ess_raw$wrkorg = ifelse(ess_raw$wrkorg == 2, 0, ess_raw$wrkorg)
+ess_raw$badge = ifelse(ess_raw$badge == 2, 0, ess_raw$badge)
+ess_raw$sgnptit = ifelse(ess_raw$sgnptit == 2, 0, ess_raw$sgnptit)
+ess_raw$pbldmn = ifelse(ess_raw$pbldmn == 2, 0, ess_raw$pbldmn)
+ess_raw$bctprd = ifelse(ess_raw$bctprd == 2, 0, ess_raw$bctprd)
+
+pol_mean = ess_raw %>% filter(citizen == 1, fborn == 0) %>% group_by(cntry) %>% 
+  select(cntry, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stfgov, tvpol, rdpol, nwsppol) %>%
+  summarise(mean.contplt = mean(contplt, na.rm = TRUE),
+            mean.wrkprty = mean(wrkprty, na.rm = TRUE),
+            mean.wrkorg = mean(wrkorg, na.rm = TRUE),
+            mean.badge = mean(badge, na.rm = TRUE),
+            mean.sgnptit = mean(sgnptit, na.rm = TRUE),
+            mean.pbldmn = mean(pbldmn, na.rm = TRUE),
+            mean.bctprd = mean(bctprd, na.rm = TRUE),
+            # mean.dntmny = mean(dntmny, na.rm = TRUE),
+            # mean.ilglpst = mean(ilglpst, na.rm = TRUE),
+            mean.stfgov = mean(stfgov, na.rm = TRUE),
+            mean.tvpol = mean(tvpol, na.rm = TRUE),
+            mean.rdpol = mean(rdpol, na.rm = TRUE),
+            mean.nwsppol = mean(nwsppol, na.rm = TRUE))
+
+ess_pol = ess_raw %>% filter(residence == 1)
+ess_pol = ess_pol %>% left_join(pol_mean, by='cntry')
+```
+
+
+```{r pol models, warning=FALSE, message=FALSE}
+
+civix.cntry = c("AT", "BE", "DK", "FI", "FR", "DE", "GR", "IE", "NL", "PT", "ES", "SE", "GB")
+civix.sc =   as.numeric( c(5.5, 1.25, 8.25,  2.5,    5,     7, 5.25,    1, 6.25, 1.25, 2.5, 0, 5.5))
+civix.1 = as.data.frame(t(rbind(civix.cntry, civix.sc)))
+colnames(civix.1) = c("cntry", "civix")
+civix.1$civix = as.numeric(civix.1$civix)
+ess_pol = ess_pol %>% left_join(civix.1, by = 'cntry')
+
+ess_pol = ess_pol %>% mutate(
+  contplt.gap = contplt - mean.contplt, 
+  wrkprty.gap = wrkprty - mean.wrkprty,
+  wrkorg.gap = wrkorg - mean.wrkorg, 
+  badge.gap = badge - mean.badge,
+  sgnptit.gap = sgnptit - mean.sgnptit, 
+  pbldmn.gap = pbldmn - mean.pbldmn,
+  bctprd.gap = bctprd - mean.bctprd,
+  stfgov.gap = stfgov - mean.stfgov, 
+  tvpol.gap = tvpol - mean.tvpol,
+  rdpol.gap = rdpol - mean.rdpol,
+  nwsppol.gap = nwsppol - mean.nwsppol
+)
+```
+
+```{r contplt civix, results='asis', fig.height=3, fig.cap="Predicted Probability to have contacted politician"}
+
+pol.1 = glm(contplt ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
+pol.2 = lm(contplt.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(pol.1, pol.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "worked in political party or group",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.pol.dat = with(ess_pol, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T),
+                                        civix = 0:9))
+
+pred.pol = pol.1 %>% 
+  broom::augment(newdata = pred.pol.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) 
+
+plot(0:9, pred.pol$.fitted, type = "l", 
+     ylab = "Predicted Probability to have worked in political party", 
+     xlab = "CIVIX",
+     ylim = c(-5,0)
+     )
+  lines(0:9, pred.pol$lower, lty = 2)
+  lines(0:9, pred.pol$upper, lty = 2)
+  abline(h = 0, lty=3, col="red")
+  
+
+
+```
+
+
+
+```{r wrkprty civix, results='asis', fig.height=3, fig.cap="Predicted Probability to have worked in political party"}
+wrkprty.1 = glm(wrkprty ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
+wrkprty.2 = lm(wrkprty.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(wrkprty.1, wrkprty.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "worked in political party",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# pred.pol = wrkprty.1 %>% 
+#   broom::augment(newdata = pred.pol.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit) 
+# 
+# plot(0:9, pred.pol$.fitted, type = "l", 
+#      ylab = "Predicted Probability to have worked in political party", 
+#      xlab = "CIVIX",
+#      ylim = c(-5,-1)
+#      )
+#   lines(0:9, pred.pol$lower, lty = 2)
+#   lines(0:9, pred.pol$upper, lty = 2)
+```
+
+```{r wrkorg, results='asis', fig.height=3, fig.cap="CIVIX and to have worked in another organisation"}
+wrkorg.1 = glm(wrkorg ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
+wrkorg.2 = lm(wrkorg.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(wrkorg.1, wrkorg.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "have worked in another organisation",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# pred.pol = wrkorg.1 %>% 
+#   broom::augment(newdata = pred.pol.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit) 
+# 
+# plot(0:9, pred.pol$.fitted, type = "l", 
+#      ylab = "Predicted Probability to have worked in another organisation", 
+#      xlab = "CIVIX",
+#      ylim = c(-5,-1)
+#      )
+#   lines(0:9, pred.pol$lower, lty = 2)
+#   lines(0:9, pred.pol$upper, lty = 2)
+wrkorg.2.plot = wrkorg.2 %>% broom::augment(.) %>% 
+  mutate(upper = .fitted + 1.96 * .se.fit, 
+         lower = .fitted - 1.96 * .se.fit)
+
+# plot(ess_pol$civix, ess_pol$wrkorg.gap)
+#   abline(wrkorg.2)
+
+# plot(wrkorg.2)
+  
+# ggplot(wrkorg.2.plot, aes(civix, wrkorg.gap)) + 
+#   geom_point() + 
+#   geom_smooth(data = wrkorg.2.plot, aes(civix, .fitted), method = "lm") + 
+#   xlab("worked in another organisation") + 
+#   theme_bw()
+```
+
+```{r badge,results='asis', fig.height=3, fig.cap="Worn or displayed campaign badge/sticker"}
+badge.1 = glm(badge ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
+badge.2 = lm(badge.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(badge.1, badge.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Worn or displayed campaign badge/sticker",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# pred.pol = badge.1 %>% 
+#   broom::augment(newdata = pred.pol.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit) 
+# 
+# plot(0:9, pred.pol$.fitted, type = "l", 
+#      ylab = "Predicted Probability to have worn or displayed campaign badge/sticker", 
+#      xlab = "CIVIX",
+#      ylim = c(-5,-1)
+#      )
+#   lines(0:9, pred.pol$lower, lty = 2)
+#   lines(0:9, pred.pol$upper, lty = 2)
+```
+
+```{r sgnptit,results='asis', fig.height=3, fig.cap="Signed petition"}
+sgnptit.1 = glm(sgnptit ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
+sgnptit.2 = lm(sgnptit.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(sgnptit.1, sgnptit.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Signed petition",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.pol = badge.1 %>% 
+  broom::augment(newdata = pred.pol.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) 
+
+plot(0:9, pred.pol$.fitted, type = "l", 
+     ylab = "Predicted Probability to have signed petition", 
+     xlab = "CIVIX",
+     ylim = c(-5,0)
+     )
+  lines(0:9, pred.pol$lower, lty = 2)
+  lines(0:9, pred.pol$upper, lty = 2)
+  abline(h = 0, lty=3, col="red")
+```
+
+```{r pbldmn,results='asis', fig.height=3, fig.cap="Taken part in lawful public demonstration"}
+pbldmn.1 = glm(pbldmn ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
+pbldmn.2 = lm(pbldmn.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(pbldmn.1, pbldmn.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Taken part in lawful public demonstration",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# pred.pol = badge.1 %>% 
+#   broom::augment(newdata = pred.pol.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit) 
+# 
+# plot(0:9, pred.pol$.fitted, type = "l", 
+#      ylab = "Predicted Probability to have taken part in lawful public demonstration", 
+#      xlab = "CIVIX",
+#      ylim = c(-5,-1)
+#      )
+#   lines(0:9, pred.pol$lower, lty = 2)
+#   lines(0:9, pred.pol$upper, lty = 2)
+```
+
+```{r bctprd,results='asis', fig.height=3, fig.cap="boycotted certain products"}
+
+bctprd.1 = glm(bctprd ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
+bctprd.2 = lm(bctprd.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(bctprd.1, bctprd.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "boycotted certain products",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.pol = bctprd.1 %>%
+  broom::augment(newdata = pred.pol.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit)
+
+plot(0:9, pred.pol$.fitted, type = "l",
+     ylab = "Predicted Probability to have taken part in lawful public demonstration",
+     xlab = "CIVIX",
+     ylim = c(-5,-1)
+     )
+  lines(0:9, pred.pol$lower, lty = 2)
+  lines(0:9, pred.pol$upper, lty = 2)
+  
+```
+
+```{r stfgov, results='asis'}
+stfgov.1 = lm(stfgov ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # absolute level
+stfgov.2 = lm(stfgov.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(stfgov.1, stfgov.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "satisfaction with government",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r tvpol, results='asis'}
+tvpol.1 = lm(tvpol ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # absolute level
+tvpol.2 = lm(tvpol.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(tvpol.1, tvpol.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Watching TV for News about Politics",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r rdpol, results='asis'}
+rdpol.1 = lm(rdpol ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # absolute level
+rdpol.2 = lm(rdpol.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(rdpol.1, rdpol.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Listening to Radio for News about Politics",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+```
+
+```{r nwsppol, results='asis'}
+nwsppol.1 = lm(nwsppol ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # absolute level
+nwsppol.2 = lm(nwsppol.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
+
+stargazer(nwsppol.1, nwsppol.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Reading Newspaper for News about Politics",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+```
+
+## Social Incorporation
+
+```{r socio incop, warning=FALSE, message=FALSE}
+### social incorporation
+
+# ess_raw$stflife # How satisfied with life as a whole
+# 
+# table(ess_raw$pplhlp) # Most of the time people helpful or mostly looking out for themselves (0: look out for themselves, 10: trying tobe helpful)
+# 
+# ess_raw$happy # How happy are you
+
+## ess_raw$inmdisc # Anyone to discuss intimate and personal matters with
+
+# ess_raw$aesfdrk # Feeling of safety of walking alone in local area after dark
+# 
+# ess_raw$health # Subjective general health
+# 
+# ess_raw$dscrgrp # Member of a group discriminated against in this country
+# 
+# ess_raw$dscrrce # Discrimination of respondent's group: colour or race
+# 
+# ess_raw$dscrntn # Discrimination of respondent's group: nationality
+# 
+# # ess_raw$dscretn # Discrimination of respondent's group: ethnic group
+# 
+# ess_raw$lnghoma # Language most often spoken at home: first mentioned *** COME BACK FOR THIS
+# 
+# ### citizen involvement
+# 
+# ess_raw$sptcptp # Sports/outdoor activity club, last 12 months: participated
+# 
+# ess_raw$cltoptp # Cultural/hobby activity organisation, last 12 months: participated
+# 
+# ess_raw$truptp # Trade union, last 12 months: participated
+# 
+# ess_raw$prfoptp # Business/profession/farmers organisation, last 12 months: participated
+# 
+# ess_raw$cnsoptp # Consumer/automobile organisation, last 12 months: participated
+# 
+# ess_raw$hmnoptp # Humanitarian organisation etc., last 12 months: participated
+# 
+# ess_raw$epaoptp # Environmental/peace/animal organisation, last 12 months: participated
+# 
+# ess_raw$rlgoptp # Religious/church organisation, last 12 months: participated
+# 
+# ess_raw$prtyptp # Political party, last 12 months: participated
+# 
+# ess_raw$setoptp # Science/education/teacher organisation, last 12 months: participated
+# 
+# ess_raw$sclcptp # Social club etc., last 12 months: participated
+# 
+# ess_raw$othvptp # Other voluntary organisation, last 12 months: participated
+
+ess_raw$dscrgrp = ifelse(ess_raw$dscrgrp == 2, 0, ess_raw$dscrgrp) # 1 as yes, 0 as no
+
+ess_raw = ess_raw %>% 
+  filter(cntry %in% c("DK", "NL", "DE", "AT", "FR", "GB", "GR", "IE", "SE", "BE", "PT", "ES", "FI","LU", "IT"))  
+  
+main.lan.1 = ess_raw %>% group_by(cntry) %>% 
+  filter(lnghoma != 999, lnghoma != 888, lnghoma != 777) %>% 
+  summarise(main.lan.1 = tail(names(sort(table(lnghoma))),1))
+
+main.lan.2 = ess_raw %>% group_by(cntry) %>% 
+  filter(lnghoma != 999, lnghoma != 888, lnghoma != 777) %>% 
+  summarise(main.lan.2 = tail(names(sort(table(lnghoma))),2)[1])
+
+ess_raw = ess_raw %>% 
+  left_join(main.lan.1, by = "cntry") %>% 
+  left_join(main.lan.2, by = "cntry")
+
+ess_raw = ess_raw %>% group_by(cntry) %>%
+  mutate(main.lan = ifelse(lnghoma == main.lan.1 |lnghoma == main.lan.2 , 1, 0))
+  # 1: speak majority language at home, 0: minority language
+
+soc_mean = ess_raw %>% filter(citizen == 1, fborn == 0) %>% group_by(cntry) %>% 
+  select(cntry, stflife, pplhlp, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, main.lan) %>%
+  summarise(mean.stflife = mean(stflife, na.rm = TRUE),
+            mean.pplhlp = mean(pplhlp, na.rm = TRUE),
+            mean.happy = mean(happy, na.rm = TRUE),
+            # mean.inmdisc = mean(inmdisc, na.rm = TRUE),
+            mean.aesfdrk = mean(aesfdrk, na.rm = TRUE),
+            mean.health = mean(health, na.rm = TRUE),
+            mean.dscrgrp = mean(dscrgrp, na.rm = TRUE),
+            mean.dscrrce = mean(dscrrce, na.rm = TRUE),
+            mean.dscrntn = mean(dscrntn, na.rm = TRUE),
+            mean.lan = mean(main.lan, na.rm = TRUE))
+
+ess_soc = ess_raw %>% filter(residence == 1)
+ess_soc = ess_soc %>% left_join(soc_mean, by='cntry')
+
+ess_soc = ess_soc %>% left_join(civix.1, by = 'cntry')
+
+ess_soc = ess_soc %>%  mutate(
+  stflife.gap = stflife - mean.stflife, 
+  pplhlp.gap = pplhlp - mean.pplhlp,
+  happy.gap = happy - mean.happy,
+  aesfdrk.gap = aesfdrk - mean.aesfdrk,
+  health.gap = health - mean.health, 
+  dscrgrp.gap = dscrgrp - mean.dscrgrp,
+  dscrrce.gap = dscrrce - mean.dscrrce,
+  dscrntn.gap = dscrntn - mean.dscrntn,
+  lan.gap = main.lan - mean.lan
+  )
+
+```
+
+```{r stflife, results='asis'}
+stflife.1 = lm(stflife ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # absolute level
+stflife.2 = lm(stflife.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
+
+# stargazer(stflife.1, stflife.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "Satisfaction with Life",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r pplhlp, results='asis'}
+pplhlp.1 = lm(pplhlp ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # absolute level
+pplhlp.2 = lm(pplhlp.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
+
+# stargazer(pplhlp.1, pplhlp.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "People are helpful",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r happy, results='asis'}
+happy.1 = lm(happy ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # absolute level
+happy.2 = lm(happy.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
+
+# stargazer(happy.1, happy.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "People are helpful",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r aesfdrk, results='asis'}
+aesfdrk.1 = lm(aesfdrk ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # absolute level
+aesfdrk.2 = lm(aesfdrk.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
+
+stargazer(aesfdrk.1, aesfdrk.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Feel safe after dark",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r health, results='asis'}
+health.1 = lm(health ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # absolute level
+health.2 = lm(health.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
+
+stargazer(health.1, health.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "subjective general health",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r dscrgrp, results='asis'}
+dscrgrp.1 = glm(dscrgrp ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc, family = "binomial") # absolute level
+dscrgrp.2 = lm(dscrgrp.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
+
+# stargazer(dscrgrp.1, dscrgrp.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "subjective general health",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+
+```
+
+```{r language, results='asis'}
+main.lan.1 = glm(main.lan ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc, family = "binomial") # absolute level
+main.lan.2 = lm(lan.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
+
+stargazer(main.lan.1, main.lan.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "language spoken at home",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.soc.dat = with(ess_soc, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T),
+                                        civix = 0:9))
+
+pred.soc = main.lan.1 %>%
+  broom::augment(newdata = pred.soc.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit)
+
+plot(0:9, pred.soc$.fitted, type = "l",
+     ylab = "Predicted Probability to speak mainstream languages at home",
+     xlab = "CIVIX" ,
+     ylim = c(0,1)
+     )
+  lines(0:9, pred.soc$lower, lty = 2)
+  lines(0:9, pred.soc$upper, lty = 2)
+  abline(h = 0, lty=3, col="red")
+```
+## Socioeconomic incorporation
+
+```{r}
+# pdjobev - Ever had a paid job
+# pdjobyr - Year last in paid job
+# emplrel - Employment relation
+# emplno - Number of employees respondent has/had
+# wrkctra - Employment contract unlimited or limited duration
+# jbspv - Responsible for supervising other employees
+# wkdcorga - Allowed to decide how daily work is organised
+# wkhtot - Total hours normally worked per week in main job overtime included
+# iscoco - Occupation, ISCO88 (com)
+# uemp3m - Ever unemployed and seeking work for a period more than three months
+# uemp12m - Any period of unemployment and work seeking lasted 12 months or more 
+# uemp5yr - Any period of unemployment and work seeking within last 5 years
+
+# hinctnta - Household's total net income, all sources
+
+ess_raw$pdjobev = ifelse(ess_raw$pdjobev > 5, NA, 
+                         ifelse(ess_raw$pdjobev == 2, 0, ess_raw$pdjobev)) # 1 as yes, 0 as no
+ess_raw$pdjobyr = ifelse(ess_raw$pdjobyr > 2010, NA, ess_raw$pdjobyr)
+essr = c(2002, 2004, 2006, 2008, 2010)
+essround = c(1:5)
+essround = as.data.frame(t(rbind(essr, essround)))
+ess_raw = ess_raw %>% left_join(essround, by='essround')
+ess_raw = ess_raw %>% mutate(pdjobyr = essr - pdjobyr)
+
+ess_raw$self.emply = ifelse(ess_raw$emplrel == 1, 0, 
+                            ifelse(ess_raw$emplrel == 2, 1, 
+                                   ifelse(ess_raw$emplrel == 3, 1, NA))) # remember that there's no "gap with natives" in this question
+ess_raw$wrkctr = ifelse(ess_raw$wrkctra == 1, 0,
+                         ifelse(ess_raw$wrkctra == 2, 1, 
+                                ifelse(ess_raw$wrkctra == 3, 1, NA))) # 1 as w/ limited contract or no contract at all, 0 as unlimited contract
+ess_raw$contract = ifelse(ess_raw$wrkctra == 1, 1, 
+                             ifelse(ess_raw$wrkctra == 2, 1, 
+                                    ifelse(ess_raw$wrkctra == 3, 0, NA))) # 1 as with contract, 0 as w/o contract
+
+ess_raw$jbspv = ifelse(ess_raw$jbspv == 2, 0, 
+                       ifelse(ess_raw$jbspv == 1, 1, NA))
+
+ess_raw$wkdcorga = ifelse(ess_raw$wkdcorga > 10, NA, ess_raw$wkdcorga)
+ess_raw$wkhtot = ifelse(ess_raw$wkhtot > 168, NA, ess_raw$wkhtot)
+
+iscoco.h.w = c(100:3500) # high skilled white collar
+iscoco.l.w = c(4000:5500) # low skilled white collar
+iscoco.h.b = c(6000:7500) # high skilled blue collar
+iscoco.l.b = c(8000:9330) # low skilled blue collar
+ess_raw$skill = ifelse(ess_raw$iscoco %in% iscoco.h.w, 1, 
+                       ifelse(ess_raw$iscoco %in% iscoco.h.b, 1,
+                              ifelse(ess_raw$iscoco %in% iscoco.l.w, 0,
+                                     ifelse(ess_raw$iscoco %in% iscoco.l.b, 0, NA)))) # 1 as high skilled, 0 as low skilled
+
+ess_raw$blue = ifelse(ess_raw$iscoco %in% iscoco.h.w, 0, 
+                       ifelse(ess_raw$iscoco %in% iscoco.l.w, 0,
+                              ifelse(ess_raw$iscoco %in% iscoco.h.b, 1,
+                                     ifelse(ess_raw$iscoco %in% iscoco.l.b, 1, NA)))) # 1 as blue collar, 0 as white
+
+ess_raw$uemp3m = ifelse(ess_raw$uemp3m == 2, 0, 
+                        ifelse(ess_raw$uemp3m == 1, 1, NA))
+
+ess_raw$uemp12m = ifelse(ess_raw$uemp12m == 2, 0, 
+                        ifelse(ess_raw$uemp12m == 1, 1, NA))
+
+ess_raw$uemp5yr = ifelse(ess_raw$uemp5yr == 2, 0, 
+                        ifelse(ess_raw$uemp5yr == 1, 1, NA))
+
+ess_raw$soc.welfare = ifelse(ess_raw$hincsrca == 5 | ess_raw$hincsrca == 6, 1, 0)
+
+ses_mean = ess_raw %>% filter(citizen == 1, fborn == 0) %>% group_by(cntry) %>% 
+  select(pdjobev, pdjobyr, emplno, wrkctr, jbspv, wkdcorga, wkhtot, skill, blue, contract, hinctnt, uemp3m, uemp12m, uemp5yr, soc.welfare, brwmny) %>%
+  summarise(mean.pdjobev = mean(pdjobev, na.rm = TRUE),
+            mean.pdjobyr = mean(pdjobyr, na.rm = TRUE),
+            mean.emplno = mean(emplno, na.rm = TRUE),
+            mean.wrkctr = mean(wrkctr, na.rm = TRUE),
+            mean.jbspv = mean(jbspv, na.rm = TRUE), 
+            mean.wkdcorga = mean(wkdcorga, na.rm = TRUE), 
+            mean.wkhtot = mean(wkhtot, na.rm = TRUE), 
+            mean.skill = mean(skill, na.rm = TRUE),
+            mean.blue = mean(blue, na.rm = TRUE),
+            mean.contract = mean(contract, na.rm = TRUE),
+            mean.hinctnt = mean(hinctnt, na.rm = TRUE), 
+            mean.uemp3m = mean(uemp3m, na.rm = TRUE),
+            mean.uemp12m = mean(uemp12m, na.rm = TRUE),
+            mean.uemp5yr = mean(uemp5yr, na.rm = TRUE), 
+            mean.soc.welfare = mean(soc.welfare, na.rm = TRUE),
+            mean.brwmny = mean(brwmny, na.rm = TRUE))
+
+ess_ses = ess_raw %>% filter(residence == 1)
+ess_ses = ess_ses %>% left_join(ses_mean, by='cntry')
+
+ess_ses = ess_ses %>% left_join(civix.1, by = 'cntry')
+
+ess_ses = ess_ses %>%  mutate(
+  pdjobev.gap = pdjobev - mean.pdjobev, 
+  pdjobyr.gap = pdjobyr - mean.pdjobyr,
+  emplno.gap = emplno - mean.emplno,
+  wrkctr.gap = wrkctr - mean.wrkctr,
+  jbspv.gap = jbspv - mean.jbspv, 
+  wkdcorga.gap = wkdcorga - mean.wkdcorga,
+  wkhtot.gap = wkhtot - mean.wkhtot,
+  skill.gap = skill - mean.skill,
+  blue.gap = blue - mean.blue,
+  contract.gap = contract - mean.contract,
+  hinctnt.gap = hinctnt - mean.hinctnt, 
+  uemp3m.gap = uemp3m - mean.uemp3m,
+  uemp12m.gap = uemp12m - mean.uemp12m,
+  uemp5yr.gap = uemp5yr - mean.uemp5yr,
+  soc.welfare.gap = soc.welfare - mean.soc.welfare,
+  brwmny.gap = brwmny - mean.brwmny
+  )
+
+ses.dat = with(ess_ses, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T),
+                                   civix = 0:9))
+```
+
+```{r pdjobev, results='asis'}
+pdjobev.1 = glm(pdjobev ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+pdjobev.2 = lm(pdjobev.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+# stargazer(pdjobev.1, pdjobev.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "language spoken at home",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# absolute = pdjobev.1 %>% 
+#   broom::augment(newdata = ses.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit) %>% 
+#   select(.fitted, upper, lower) 
+```
+
+```{r pdjobyr, results='asis'}
+pdjobyr.1 = lm(pdjobyr ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # absolute level
+pdjobyr.2 = lm(pdjobyr.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+# stargazer(pdjobyr.1, pdjobyr.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "language spoken at home",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r self.emply, results='asis'}
+self.emply.1 = glm(self.emply ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+
+# stargazer(self.emply.1, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "language spoken at home",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r emplno, results='asis'}
+emplno.1 = lm(emplno ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # absolute level
+emplno.2 = lm(emplno.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+# stargazer(emplno.1, emplno.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "language spoken at home",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r contract, results='asis'}
+contract.1 = glm(contract ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+contract.2 = lm(contract.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(contract.1, contract.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "working under contract",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.ses = contract.1 %>%
+  broom::augment(newdata = ses.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit)
+
+plot(0:9, pred.ses$.fitted, type = "l",
+     ylab = "Predicted Probability to work under contracts",
+     xlab = "CIVIX"  ,ylim = c(0,2.5)
+     )
+  lines(0:9, pred.ses$lower, lty = 2)
+  lines(0:9, pred.ses$upper, lty = 2)
+  abline(h = 0, lty=3, col="red")
+```
+
+```{r jbspv, results='asis'}
+jbspv.1 = glm(jbspv ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+jbspv.2 = lm(jbspv.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(jbspv.1, jbspv.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "working under contract",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# pred.ses = jbspv.1 %>%
+#   broom::augment(newdata = ses.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit)
+# 
+# plot(0:9, pred.ses$.fitted, type = "l",
+#      ylab = "Predicted Probability to work under contracts",
+#      xlab = "CIVIX"  ,ylim = c(0,2.5)
+#      )
+#   lines(0:9, pred.ses$lower, lty = 2)
+#   lines(0:9, pred.ses$upper, lty = 2)
+```
+
+```{r wkdcorga, results='asis'}
+wkdcorga.1 = lm(wkdcorga ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # absolute level
+wkdcorga.2 = lm(wkdcorga.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(wkdcorga.1, wkdcorga.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "control over organization of daily work",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r wkhtot, results='asis'}
+wkhtot.1 = lm(wkhtot ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # absolute level
+wkhtot.2 = lm(wkhtot.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+# stargazer(wkhtot.1, wkhtot.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "hours worked per week",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r skill, results='asis', fig.height=3, fig.cap=""}
+skill.1 = glm(skill ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+skill.2 = lm(skill.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(skill.1, skill.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Skilled worker or not",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.ses = skill.1 %>%
+  broom::augment(newdata = ses.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit)
+
+plot(0:9, pred.ses$.fitted, type = "l",
+     ylab = "Predicted Probability to work under contracts",
+     xlab = "CIVIX" ,ylim = c(-1, 0.5)
+     )
+  lines(0:9, pred.ses$lower, lty = 2)
+  lines(0:9, pred.ses$upper, lty = 2)
+  abline(h = 0, lty=3, col="red")
+```
+
+```{r blue, results='asis', fig.cap="Blue collars or not", fig.height=3}
+blue.1 = glm(blue ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+blue.2 = lm(blue.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(blue.1, blue.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Skilled worker or not",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# pred.ses = blue.1 %>%
+#   broom::augment(newdata = ses.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit)
+# 
+# plot(0:9, pred.ses$.fitted, type = "l",
+#      ylab = "Predicted Probability to work under contracts",
+#      xlab = "CIVIX" ,ylim = c(-1, 0.5)
+#      )
+#   lines(0:9, pred.ses$lower, lty = 2)
+#   lines(0:9, pred.ses$upper, lty = 2)
+```
+
+```{r hinctnt, results='asis', fig.height=3, fig.cap="Household total net income"}
+hinctnt.1 = lm(hinctnt ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # absolute level
+hinctnt.2 = lm(hinctnt.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(hinctnt.1, blue.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "Skilled worker or not",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r uemp3m, results='asis', fig.height=3, fig.cap="unemployed for three months"}
+uemp3m.1 = glm(uemp3m ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+uemp3m.2 = lm(uemp3m.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+# stargazer(uemp3m.1, uemp3m.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "unemployed for three months",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+
+```{r uemp12m, results='asis', fig.height=3, fig.cap="unemployed for three months"}
+uemp12m.1 = glm(uemp12m ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+uemp12m.2 = lm(uemp12m.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(uemp12m.1, uemp12m.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "unemployed for three months",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.ses = uemp12m.1 %>%
+  broom::augment(newdata = ses.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit)
+
+plot(0:9, pred.ses$.fitted, type = "l",
+     ylab = "Predicted Probability to work under contracts",
+     xlab = "CIVIX" ,ylim = c(-1, 1)
+     )
+  lines(0:9, pred.ses$lower, lty = 2)
+  lines(0:9, pred.ses$upper, lty = 2)
+  abline(h = 0, lty=3, col="red")
+```
