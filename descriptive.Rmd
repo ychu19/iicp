@@ -28,22 +28,22 @@ ess_2010 = haven::read_stata("ESS5e03_4.dta")
 
 ```{r ess_yr, echo=TRUE, message=FALSE, warning=FALSE}
 ess_2002 = ess_2002 %>%
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctr, jbspv, wkdcorg, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt) %>%
-  plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn", "wrkctr"="wrkctra", "wkdcorg" = "wkdcorga"))
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctr, jbspv, wkdcorg, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt, hincsrc, brwmny) %>%
+  plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn", "wrkctr"="wrkctra", "wkdcorg" = "wkdcorga", "hincsrc" = "hincsrca"))
   ess_2002 = ess_2002 %>% mutate(hinctnt = hinctnt/12*10) # rescale to fit data from 2008 and 2010
 ess_2004 = ess_2004 %>%
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt, hincsrca, brwmny) %>%
   plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
   ess_2004 = ess_2004 %>% mutate(hinctnt = hinctnt/12*10)
 ess_2006 = ess_2006 %>%
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnt, hincsrca, brwmny) %>%
   plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn"))
   ess_2006 = ess_2006 %>% mutate(hinctnt = hinctnt/12*10)
 ess_2008 = ess_2008 %>%
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnta) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghoma, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnta, hincsrca, brwmny) %>%
   plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvla"="edu","brncntr"="fborn", "hinctnta" = "hinctnt"))
 ess_2010 = ess_2010 %>%
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghom1, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnta) %>%
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, pplhlp, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stflife, stfeco, stfgov, happy, aesfdrk, health, dscrgrp, dscrrce, dscrntn, lnghom1, pdjobev, pdjobyr, emplrel, emplno, wrkctra, jbspv, wkdcorga, wkhtot, iscoco, tvpol, rdpol, nwsppol, uemp3m, uemp12m, uemp5yr, hinctnta, hincsrca, brwmny) %>%
   plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvlb"="edu","livecnta" = "livecntr","brncntr"="fborn", "lnghom1"="lnghoma", "hinctnta" = "hinctnt"))
 ess_2010$livecntr = ess_2010$livecntr - 2010
 ess_2010$livecntr = ifelse(ess_2010$livecntr >= 1, 1,
@@ -363,8 +363,32 @@ employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = ess_
 # length(employ.h.1$residuals) 1813
 # length(employ.l.1$residuals) 2673
 
-absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
-absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+employ.dat.h = with(ses_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = employ.h.1 %>% 
+  broom::augment(newdata = ess_h.nonciti, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+employ.dat.l = with(ses_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = employ.l.1 %>% 
+  broom::augment(newdata = ess_l.nonciti, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
+
+# absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+# absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
 
 gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
 gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
@@ -1152,8 +1176,32 @@ employ.l.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth, data = ess_
 # length(employ.h.1$residuals) 1238
 # length(employ.l.1$residuals) 1646
 
-absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
-absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+# absolute.h = as.vector(c(employ.h.1$coefficients[1],confint(employ.h.1)[1,]))
+# absolute.l = as.vector(c(employ.l.1$coefficients[1],confint(employ.l.1)[1,]))
+
+employ.dat.h = with(ess_h.tenyr, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = employ.h.1 %>% 
+  broom::augment(newdata = employ.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+employ.dat.l = with(ess_l.tenyr, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = employ.l.1 %>% 
+  broom::augment(newdata = employ.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(employ.h.2$coefficients[1],confint(employ.h.2)[1,]))
 gap.l = as.vector(c(employ.l.2$coefficients[1],confint(employ.l.2)[1,]))
@@ -2531,6 +2579,14 @@ ess_raw$tvpol = ifelse(ess_raw$tvpol > 8, NA, ess_raw$tvpol)
 ess_raw$rdpol = ifelse(ess_raw$rdpol > 8, NA, ess_raw$rdpol)
 ess_raw$nwsppol = ifelse(ess_raw$nwsppol > 8, NA, ess_raw$nwsppol)
 
+ess_raw$contplt = ifelse(ess_raw$contplt == 2, 0, ess_raw$contplt)
+ess_raw$wrkprty = ifelse(ess_raw$wrkprty == 2, 0, ess_raw$wrkprty)
+ess_raw$wrkorg = ifelse(ess_raw$wrkorg == 2, 0, ess_raw$wrkorg)
+ess_raw$badge = ifelse(ess_raw$badge == 2, 0, ess_raw$badge)
+ess_raw$sgnptit = ifelse(ess_raw$sgnptit == 2, 0, ess_raw$sgnptit)
+ess_raw$pbldmn = ifelse(ess_raw$pbldmn == 2, 0, ess_raw$pbldmn)
+ess_raw$bctprd = ifelse(ess_raw$bctprd == 2, 0, ess_raw$bctprd)
+
 pol_mean = ess_raw %>% filter(citizen == 1, fborn == 0) %>% group_by(cntry) %>% 
   select(cntry, contplt, wrkprty, wrkorg, badge, sgnptit, pbldmn, bctprd, stfgov, tvpol, rdpol, nwsppol) %>%
   summarise(mean.contplt = mean(contplt, na.rm = TRUE),
@@ -2582,28 +2638,54 @@ pol_l = pol_l %>%  mutate(
   )
 ```
 
+## Using Goodman and Wright's methods
+
 ```{r contplt model, fig.height=1.5, fig.cap='Whether have worked in political party or action group last 12 months'}
 
-pol.h.1 = lm(contplt ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
+pol.h.1 = glm(contplt ~ agea + ethnic + female + edu + eubirth, data = pol_h, family = "binomial") # absolute level
 pol.h.2 = lm(contplt.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
-pol.l.1 = lm(contplt ~ agea + ethnic + female + edu + eubirth, data = pol_l) # absolute level
+pol.l.1 = glm(contplt ~ agea + ethnic + female + edu + eubirth, data = pol_l, family = "binomial") # absolute level
 pol.l.2 = lm(contplt.gap ~ agea + ethnic + female + edu + eubirth, data = pol_l) # gap
 
-absolute.h = as.vector(c(pol.h.1$coefficients[1],confint(pol.h.1)[1,]))
-absolute.l = as.vector(c(pol.l.1$coefficients[1],confint(pol.l.1)[1,]))
+# absolute.h = as.vector(c(pol.h.1$coefficients[1],confint(pol.h.1)[1,]))
+# absolute.l = as.vector(c(pol.l.1$coefficients[1],confint(pol.l.1)[1,]))
+
+pol.dat.h = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = pol.h.1 %>% 
+  broom::augment(newdata = pol.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+pol.dat.l = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = pol.l.1 %>% 
+  broom::augment(newdata = pol.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(pol.h.2$coefficients[1],confint(pol.h.2)[1,]))
 gap.l = as.vector(c(pol.l.2$coefficients[1],confint(pol.l.2)[1,]))
 
 contplt.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(contplt.1) = c("intercept", "min", "max")
-contplt.1 = contplt.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+contplt.1 = contplt.1 %>%mutate(var = c('High CIVIX: Abs. Level (predicted)', 'Low CIVIX: Abs. Level (predicted)','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
 contplt.1$var = factor(contplt.1$var, as.character(contplt.1$var))
 
 ggplot(contplt.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-2.5, 2.5)) + 
+  coord_cartesian(xlim = c(-3, 3)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -2612,77 +2694,149 @@ ggplot(contplt.1,aes(y=var)) +
 
 
 ```{r wrkprty model, fig.height=1.5, fig.cap='Whether have contacted politician or government official last 12 months'}
-wrkprty.h.1 = lm(wrkprty ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
+wrkprty.h.1 = glm(wrkprty ~ agea + ethnic + female + edu + eubirth, data = pol_h, family = "binomial") # absolute level
 wrkprty.h.2 = lm(wrkprty.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
-wrkprty.l.1 = lm(wrkprty ~ agea + ethnic + female + edu + eubirth, data = pol_l) # absolute level
+wrkprty.l.1 = glm(wrkprty ~ agea + ethnic + female + edu + eubirth, data = pol_l, family = "binomial") # absolute level
 wrkprty.l.2 = lm(wrkprty.gap ~ agea + ethnic + female + edu + eubirth, data = pol_l) # gap
 
-absolute.h = as.vector(c(wrkprty.h.1$coefficients[1],confint(wrkprty.h.1)[1,]))
-absolute.l = as.vector(c(wrkprty.l.1$coefficients[1],confint(wrkprty.l.1)[1,]))
+# absolute.h = as.vector(c(wrkprty.h.1$coefficients[1],confint(wrkprty.h.1)[1,]))
+# absolute.l = as.vector(c(wrkprty.l.1$coefficients[1],confint(wrkprty.l.1)[1,]))
+
+wrkprty.dat.h = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = wrkprty.h.1 %>% 
+  broom::augment(newdata = wrkprty.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+wrkprty.dat.l = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = wrkprty.l.1 %>% 
+  broom::augment(newdata = wrkprty.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(wrkprty.h.2$coefficients[1],confint(wrkprty.h.2)[1,]))
 gap.l = as.vector(c(wrkprty.l.2$coefficients[1],confint(wrkprty.l.2)[1,]))
 
 wrkprty.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(wrkprty.1) = c("intercept", "min", "max")
-wrkprty.1 = wrkprty.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+wrkprty.1 = wrkprty.1 %>% mutate(var = c('High CIVIX: Abs. Level (predicted)', 'Low CIVIX: Abs. Level (predicted)','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
 wrkprty.1$var = factor(wrkprty.1$var, as.character(wrkprty.1$var))
 
 ggplot(wrkprty.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-2.5, 2.5)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 ```
 
 ```{r wrkorg model, fig.height=1.5, fig.cap='Whether have worked in political party or action group last 12 months'}
-wrkorg.h.1 = lm(wrkorg ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
+wrkorg.h.1 = glm(wrkorg ~ agea + ethnic + female + edu + eubirth, data = pol_h, family = "binomial") # absolute level
 wrkorg.h.2 = lm(wrkorg.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
-wrkorg.l.1 = lm(wrkorg ~ agea + ethnic + female + edu + eubirth, data = pol_l) # absolute level
+wrkorg.l.1 = glm(wrkorg ~ agea + ethnic + female + edu + eubirth, data = pol_l, family = "binomial") # absolute level
 wrkorg.l.2 = lm(wrkorg.gap ~ agea + ethnic + female + edu + eubirth, data = pol_l) # gap
 
-absolute.h = as.vector(c(wrkorg.h.1$coefficients[1],confint(wrkorg.h.1)[1,]))
-absolute.l = as.vector(c(wrkorg.l.1$coefficients[1],confint(wrkorg.l.1)[1,]))
+# absolute.h = as.vector(c(wrkorg.h.1$coefficients[1],confint(wrkorg.h.1)[1,]))
+# absolute.l = as.vector(c(wrkorg.l.1$coefficients[1],confint(wrkorg.l.1)[1,]))
+
+wrkorg.dat.h = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = wrkorg.h.1 %>% 
+  broom::augment(newdata = wrkorg.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+wrkorg.dat.l = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = wrkorg.l.1 %>% 
+  broom::augment(newdata = wrkorg.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(wrkorg.h.2$coefficients[1],confint(wrkorg.h.2)[1,]))
 gap.l = as.vector(c(wrkorg.l.2$coefficients[1],confint(wrkorg.l.2)[1,]))
 
 wrkorg.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(wrkorg.1) = c("intercept", "min", "max")
-wrkorg.1 = wrkorg.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+wrkorg.1 = wrkorg.1 %>% mutate(var = c('High CIVIX: Abs. Level (predicted)', 'Low CIVIX: Abs. Level (predicted)','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
 wrkorg.1$var = factor(wrkorg.1$var, as.character(wrkorg.1$var))
 
 ggplot(wrkorg.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-2.5, 2.5)) + 
+  coord_cartesian(xlim = c(-3, 3)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 ```
 
 ```{r badge model, fig.height=1.5, fig.cap='Whether have worn or displayed campaign badge/sticker last 12 months'}
 
-badge.h.1 = lm(badge ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
+badge.h.1 = glm(badge ~ agea + ethnic + female + edu + eubirth, data = pol_h, family = "binomial") # absolute level
 badge.h.2 = lm(badge.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
-badge.l.1 = lm(badge ~ agea + ethnic + female + edu + eubirth, data = pol_l) # absolute level
+badge.l.1 = glm(badge ~ agea + ethnic + female + edu + eubirth, data = pol_l, family = "binomial") # absolute level
 badge.l.2 = lm(badge.gap ~ agea + ethnic + female + edu + eubirth, data = pol_l) # gap
 
-absolute.h = as.vector(c(badge.h.1$coefficients[1],confint(badge.h.1)[1,]))
-absolute.l = as.vector(c(badge.l.1$coefficients[1],confint(badge.l.1)[1,]))
+# absolute.h = as.vector(c(badge.h.1$coefficients[1],confint(badge.h.1)[1,]))
+# absolute.l = as.vector(c(badge.l.1$coefficients[1],confint(badge.l.1)[1,]))
+
+badge.dat.h = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = badge.h.1 %>% 
+  broom::augment(newdata = badge.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+badge.dat.l = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = badge.l.1 %>% 
+  broom::augment(newdata = badge.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(badge.h.2$coefficients[1],confint(badge.h.2)[1,]))
 gap.l = as.vector(c(badge.l.2$coefficients[1],confint(badge.l.2)[1,]))
 
 badge.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(badge.1) = c("intercept", "min", "max")
-badge.1 = badge.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+badge.1 = badge.1 %>% mutate(var = c('High CIVIX: Abs. Level (predicted)', 'Low CIVIX: Abs. Level (predicted)','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
 badge.1$var = factor(badge.1$var, as.character(badge.1$var))
 
 ggplot(badge.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-2.5, 2.5)) + 
+  coord_cartesian(xlim = c(-4, 4)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 
@@ -2690,20 +2844,44 @@ ggplot(badge.1,aes(y=var)) +
 
 ```{r sgnptit model, fig.height=1.5, fig.cap='Whether signed petition last 12 months'}
 
-sgnptit.h.1 = lm(sgnptit ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
+sgnptit.h.1 = glm(sgnptit ~ agea + ethnic + female + edu + eubirth, data = pol_h, family = "binomial") # absolute level
 sgnptit.h.2 = lm(sgnptit.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
-sgnptit.l.1 = lm(sgnptit ~ agea + ethnic + female + edu + eubirth, data = pol_l) # absolute level
+sgnptit.l.1 = glm(sgnptit ~ agea + ethnic + female + edu + eubirth, data = pol_l, family = "binomial") # absolute level
 sgnptit.l.2 = lm(sgnptit.gap ~ agea + ethnic + female + edu + eubirth, data = pol_l) # gap
 
-absolute.h = as.vector(c(sgnptit.h.1$coefficients[1],confint(sgnptit.h.1)[1,]))
-absolute.l = as.vector(c(sgnptit.l.1$coefficients[1],confint(sgnptit.l.1)[1,]))
+# absolute.h = as.vector(c(sgnptit.h.1$coefficients[1],confint(sgnptit.h.1)[1,]))
+# absolute.l = as.vector(c(sgnptit.l.1$coefficients[1],confint(sgnptit.l.1)[1,]))
+
+sgnptit.dat.h = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = sgnptit.h.1 %>% 
+  broom::augment(newdata = sgnptit.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+sgnptit.dat.l = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = sgnptit.l.1 %>% 
+  broom::augment(newdata = sgnptit.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(sgnptit.h.2$coefficients[1],confint(sgnptit.h.2)[1,]))
 gap.l = as.vector(c(sgnptit.l.2$coefficients[1],confint(sgnptit.l.2)[1,]))
 
 sgnptit.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(sgnptit.1) = c("intercept", "min", "max")
-sgnptit.1 = sgnptit.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+sgnptit.1 = sgnptit.1 %>% mutate(var = c('High CIVIX: Abs. Level (predicted)', 'Low CIVIX: Abs. Level (predicted)','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
 sgnptit.1$var = factor(sgnptit.1$var, as.character(sgnptit.1$var))
 
 ggplot(sgnptit.1,aes(y=var)) + 
@@ -2716,38 +2894,86 @@ ggplot(sgnptit.1,aes(y=var)) +
 ```
 
 ```{r pbldmn model, fig.height=1.5, fig.cap='Whether taken part in lawful public demonstration last 12 months'}
-pbldmn.h.1 = lm(pbldmn ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
+pbldmn.h.1 = glm(pbldmn ~ agea + ethnic + female + edu + eubirth, data = pol_h, family = "binomial") # absolute level
 pbldmn.h.2 = lm(pbldmn.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
-pbldmn.l.1 = lm(pbldmn ~ agea + ethnic + female + edu + eubirth, data = pol_l) # absolute level
+pbldmn.l.1 = glm(pbldmn ~ agea + ethnic + female + edu + eubirth, data = pol_l, family = "binomial") # absolute level
 pbldmn.l.2 = lm(pbldmn.gap ~ agea + ethnic + female + edu + eubirth, data = pol_l) # gap
 
-absolute.h = as.vector(c(pbldmn.h.1$coefficients[1],confint(pbldmn.h.1)[1,]))
-absolute.l = as.vector(c(pbldmn.l.1$coefficients[1],confint(pbldmn.l.1)[1,]))
+# absolute.h = as.vector(c(pbldmn.h.1$coefficients[1],confint(pbldmn.h.1)[1,]))
+# absolute.l = as.vector(c(pbldmn.l.1$coefficients[1],confint(pbldmn.l.1)[1,]))
+
+pbldmn.dat.h = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = pbldmn.h.1 %>% 
+  broom::augment(newdata = pbldmn.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+pbldmn.dat.l = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = pbldmn.l.1 %>% 
+  broom::augment(newdata = pbldmn.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(pbldmn.h.2$coefficients[1],confint(pbldmn.h.2)[1,]))
 gap.l = as.vector(c(pbldmn.l.2$coefficients[1],confint(pbldmn.l.2)[1,]))
 
 pbldmn.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
 colnames(pbldmn.1) = c("intercept", "min", "max")
-pbldmn.1 = pbldmn.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+pbldmn.1 = pbldmn.1 %>% mutate(var = c('High CIVIX: Abs. Level (predicted)', 'Low CIVIX: Abs. Level (predicted)','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
 pbldmn.1$var = factor(pbldmn.1$var, as.character(pbldmn.1$var))
 
 ggplot(pbldmn.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-2.5, 2.5)) + 
+  coord_cartesian(xlim = c(-4, 4)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 ```
 
 ```{r bctprd model, fig.height=1.5, fig.cap='Whether boycotted certain products last 12 months'}
-bctprd.h.1 = lm(bctprd ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
+bctprd.h.1 = glm(bctprd ~ agea + ethnic + female + edu + eubirth, data = pol_h, family = "binomial") # absolute level
 bctprd.h.2 = lm(bctprd.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
-bctprd.l.1 = lm(bctprd ~ agea + ethnic + female + edu + eubirth, data = pol_l) # absolute level
+bctprd.l.1 = glm(bctprd ~ agea + ethnic + female + edu + eubirth, data = pol_l, family = "binomial") # absolute level
 bctprd.l.2 = lm(bctprd.gap ~ agea + ethnic + female + edu + eubirth, data = pol_l) # gap
 
-absolute.h = as.vector(c(bctprd.h.1$coefficients[1],confint(bctprd.h.1)[1,]))
-absolute.l = as.vector(c(bctprd.l.1$coefficients[1],confint(bctprd.l.1)[1,]))
+# absolute.h = as.vector(c(bctprd.h.1$coefficients[1],confint(bctprd.h.1)[1,]))
+# absolute.l = as.vector(c(bctprd.l.1$coefficients[1],confint(bctprd.l.1)[1,]))
+
+bctprd.dat.h = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = bctprd.h.1 %>% 
+  broom::augment(newdata = bctprd.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+bctprd.dat.l = with(pol_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = bctprd.l.1 %>% 
+  broom::augment(newdata = bctprd.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
 
 gap.h = as.vector(c(bctprd.h.2$coefficients[1],confint(bctprd.h.2)[1,]))
 gap.l = as.vector(c(bctprd.l.2$coefficients[1],confint(bctprd.l.2)[1,]))
@@ -2760,7 +2986,7 @@ bctprd.1$var = factor(bctprd.1$var, as.character(bctprd.1$var))
 ggplot(bctprd.1,aes(y=var)) + 
   geom_point(aes(x = intercept)) + 
   geom_errorbarh(aes(xmin = min, xmax = max)) + 
-  coord_cartesian(xlim = c(-2.5, 2.5)) + 
+  coord_cartesian(xlim = c(-3, 3)) + 
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("")
 ```
@@ -2815,6 +3041,7 @@ ggplot(tvpol.1,aes(y=var)) +
   ylab("")+ 
   xlab("Time spent watching TV about politics (intercept)")
 ```
+
 ```{r rdpol model, fig.height=1.5, fig.cap='How much of your time listening to the radio is spent listening to news or programmes about politics? (0 to 3 hours or more)'}
 rdpol.h.1 = lm(rdpol ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
 rdpol.h.2 = lm(rdpol.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
@@ -2840,6 +3067,7 @@ ggplot(rdpol.1,aes(y=var)) +
   ylab("")+ 
   xlab("Time spent listening to the radio about politics (intercept)")
 ```
+
 ```{r nwsppol model, fig.height=1.5, fig.cap='How much of your time reading newspapers is spent reading about about politics? (0 to 3 hours or more)'}
 nwsppol.h.1 = lm(nwsppol ~ agea + ethnic + female + edu + eubirth, data = pol_h) # absolute level
 nwsppol.h.2 = lm(nwsppol.gap ~ agea + ethnic + female + edu + eubirth, data = pol_h) # gap
@@ -2865,6 +3093,10 @@ ggplot(nwsppol.1,aes(y=var)) +
   ylab("") + 
   xlab("Time spent reading newspapers about politics (intercept)")
 ```
+
+
+
+
 
 ## Social Incorporation
 
@@ -3001,6 +3233,8 @@ soc_l = soc_l %>%  mutate(
   )
 
 ```
+
+### Using Goodman and Wright's methods
 
 ```{r stflife model, fig.height=1.5, fig.cap='How satisfied with life as a whole'}
 stflife.h.1 = lm(stflife ~ agea + ethnic + female + edu + eubirth, data = soc_h) # absolute level
@@ -3234,6 +3468,14 @@ ggplot(lan.1,aes(y=var)) +
 
 ```
 
+
+### Playing with the models
+
+```{r}
+
+```
+
+
 ## Socio-economic incorporation
 
 ```{r socio incorporation, warning=FALSE, message=FALSE}
@@ -3301,8 +3543,10 @@ ess_raw$uemp12m = ifelse(ess_raw$uemp12m == 2, 0,
 ess_raw$uemp5yr = ifelse(ess_raw$uemp5yr == 2, 0, 
                         ifelse(ess_raw$uemp5yr == 1, 1, NA))
 
+ess_raw$soc.welfare = ifelse(ess_raw$hincsrca == 5 | ess_raw$hincsrca == 6, 1, 0)
+
 ses_mean = ess_raw %>% filter(citizen == 1, fborn == 0) %>% group_by(cntry) %>% 
-  select(pdjobev, pdjobyr, emplno, wrkctr, jbspv, wkdcorga, wkhtot, skill, blue, contract, hinctnt, uemp3m, uemp12m, uemp5yr) %>%
+  select(pdjobev, pdjobyr, emplno, wrkctr, jbspv, wkdcorga, wkhtot, skill, blue, contract, hinctnt, uemp3m, uemp12m, uemp5yr, soc.welfare, brwmny) %>%
   summarise(mean.pdjobev = mean(pdjobev, na.rm = TRUE),
             mean.pdjobyr = mean(pdjobyr, na.rm = TRUE),
             mean.emplno = mean(emplno, na.rm = TRUE),
@@ -3316,7 +3560,9 @@ ses_mean = ess_raw %>% filter(citizen == 1, fborn == 0) %>% group_by(cntry) %>%
             mean.hinctnt = mean(hinctnt, na.rm = TRUE), 
             mean.uemp3m = mean(uemp3m, na.rm = TRUE),
             mean.uemp12m = mean(uemp12m, na.rm = TRUE),
-            mean.uemp5yr = mean(uemp5yr, na.rm = TRUE))
+            mean.uemp5yr = mean(uemp5yr, na.rm = TRUE), 
+            mean.soc.welfare = mean(soc.welfare, na.rm = TRUE),
+            mean.brwmny = mean(brwmny, na.rm = TRUE))
 
 ess_ses = ess_raw %>% filter(residence == 1)
 ess_ses = ess_ses %>% left_join(ses_mean, by='cntry')
@@ -3338,7 +3584,9 @@ ses_h = ses_h %>%  mutate(
   hinctnt.gap = hinctnt - mean.hinctnt, 
   uemp3m.gap = uemp3m - mean.uemp3m,
   uemp12m.gap = uemp12m - mean.uemp12m,
-  uemp5yr.gap = uemp5yr - mean.uemp5yr
+  uemp5yr.gap = uemp5yr - mean.uemp5yr,
+  soc.welfare.gap = soc.welfare - mean.soc.welfare,
+  brwmny.gap = brwmny - mean.brwmny
   )
 
 ses_l = ses_l %>%  mutate(
@@ -3355,7 +3603,9 @@ ses_l = ses_l %>%  mutate(
   hinctnt.gap = hinctnt - mean.hinctnt, 
   uemp3m.gap = uemp3m - mean.uemp3m,
   uemp12m.gap = uemp12m - mean.uemp12m,
-  uemp5yr.gap = uemp5yr - mean.uemp5yr
+  uemp5yr.gap = uemp5yr - mean.uemp5yr,
+  soc.welfare.gap = soc.welfare - mean.soc.welfare,
+  brwmny.gap = brwmny - mean.brwmny
   )
 ```
 
@@ -3983,4 +4233,79 @@ ggplot(uemp5yr.1,aes(y=var)) +
   geom_vline(xintercept = 0, linetype = "dashed") +
   ylab("") + 
   xlab("Unemployed and seeking work for more than five years (intercept)")
+```
+
+```{r, soc.welfare, fig.height=1.5, fig.cap='Depend on social benefits'}
+soc.welfare.h.1 = glm(soc.welfare ~ agea + ethnic + female + edu + eubirth, data = ses_h, family = 'binomial') # absolute level
+soc.welfare.h.2 = lm(soc.welfare.gap ~ agea + ethnic + female + edu + eubirth, data = ses_h) # gap
+soc.welfare.l.1 = glm(soc.welfare ~ agea + ethnic + female + edu + eubirth, data = ses_l, family = 'binomial') # absolute level
+soc.welfare.l.2 = lm(soc.welfare.gap ~ agea + ethnic + female + edu + eubirth, data = ses_l) # gap
+
+# absolute.h = as.vector(c(dscrgrp.h.1$coefficients[1],confint(dscrgrp.h.1)[1,]))
+# absolute.l = as.vector(c(dscrgrp.l.1$coefficients[1],confint(dscrgrp.l.1)[1,]))
+
+soc.welfare.dat.h = with(ses_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.h = soc.welfare.h.1 %>% 
+  broom::augment(newdata = soc.welfare.dat.h, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>% 
+  select(.fitted, upper, lower) 
+
+soc.welfare.dat.l = with(ses_h, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T)))
+
+absolute.l = soc.welfare.l.1 %>% 
+  broom::augment(newdata = soc.welfare.dat.l, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit) %>%
+  select(.fitted, upper, lower)
+
+gap.h = as.vector(c(soc.welfare.h.2$coefficients[1],confint(soc.welfare.h.2)[1,]))
+gap.l = as.vector(c(soc.welfare.l.2$coefficients[1],confint(soc.welfare.l.2)[1,]))
+
+soc.welfare.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(soc.welfare.1) = c("intercept", "min", "max")
+soc.welfare.1 = soc.welfare.1 %>% mutate(var = c('High CIVIX: Abs. Level (predicted)', 'Low CIVIX: Abs. Level (predicted)','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+soc.welfare.1$var = factor(soc.welfare.1$var, as.character(soc.welfare.1$var))
+
+ggplot(soc.welfare.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-3, 3)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("") + 
+  xlab("Social benefits as the main sources of household income (intercept)")
+```
+```{r, brwmny, fig.height=5, fig.cap='How difficultt to borrow money (1: very difficult, 5: very easy)'}
+brwmny.h.1 = lm(brwmny ~ agea + ethnic + female + edu + eubirth, data = ses_h) # absolute level
+brwmny.h.2 = lm(brwmny.gap ~ agea + ethnic + female + edu + eubirth, data = ses_h) # gap
+brwmny.l.1 = lm(brwmny ~ agea + ethnic + female + edu + eubirth, data = ses_l) # absolute level
+brwmny.l.2 = lm(brwmny.gap ~ agea + ethnic + female + edu + eubirth, data = ses_l) # gap
+
+absolute.h = as.vector(c(brwmny.h.1$coefficients[1],confint(brwmny.h.1)[1,]))
+absolute.l = as.vector(c(brwmny.l.1$coefficients[1],confint(brwmny.l.1)[1,]))
+
+gap.h = as.vector(c(brwmny.h.2$coefficients[1],confint(brwmny.h.2)[1,]))
+gap.l = as.vector(c(brwmny.l.2$coefficients[1],confint(brwmny.l.2)[1,]))
+
+brwmny.1 = as.data.frame(rbind(absolute.h, absolute.l, gap.h, gap.l))
+colnames(brwmny.1) = c("intercept", "min", "max")
+brwmny.1 = brwmny.1 %>% mutate(var = c('High CIVIX: Absolute Level', 'Low CIVIX: Absolute Level','High CIVIX: Gap w/Natives','Low CIVIX: Gap w/Natives'))
+brwmny.1$var = factor(brwmny.1$var, as.character(brwmny.1$var))
+
+ggplot(brwmny.1,aes(y=var)) + 
+  geom_point(aes(x = intercept)) + 
+  geom_errorbarh(aes(xmin = min, xmax = max)) + 
+  coord_cartesian(xlim = c(-5, 5)) + 
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  ylab("") + 
+  xlab("How easy to borrow money: 1 as very difficult and 5 as very easy (intercept)")
 ```
