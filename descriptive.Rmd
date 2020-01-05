@@ -4283,7 +4283,7 @@ ggplot(uemp5yr.1,aes(y=var)) +
   xlab("Unemployed and seeking work for more than five years (intercept)")
 ```
 
-```{r, soc.welfare, fig.height=1.5, fig.cap='Depend on social benefits'}
+```{r soc.welfare, fig.height=1.5, fig.cap='Depend on social benefits'}
 soc.welfare.h.1 = glm(soc.welfare ~ agea + ethnic + female + edu + eubirth, data = ses_h, family = 'binomial') # absolute level
 soc.welfare.h.2 = lm(soc.welfare.gap ~ agea + ethnic + female + edu + eubirth, data = ses_h) # gap
 soc.welfare.l.1 = glm(soc.welfare ~ agea + ethnic + female + edu + eubirth, data = ses_l, family = 'binomial') # absolute level
@@ -4332,6 +4332,7 @@ ggplot(soc.welfare.1,aes(y=var)) +
   ylab("") + 
   xlab("Social benefits as the main sources of household income (intercept)")
 ```
+
 ```{r, brwmny, fig.height=5, fig.cap='How difficultt to borrow money (1: very difficult, 5: very easy)'}
 brwmny.h.1 = lm(brwmny ~ agea + ethnic + female + edu + eubirth, data = ses_h) # absolute level
 brwmny.h.2 = lm(brwmny.gap ~ agea + ethnic + female + edu + eubirth, data = ses_h) # gap

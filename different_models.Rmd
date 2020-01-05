@@ -158,7 +158,7 @@ pred.pol = pol.1 %>%
 plot(0:9, pred.pol$.fitted, type = "l", 
      ylab = "Predicted Probability to have worked in political party", 
      xlab = "CIVIX",
-     ylim = c(-5,0)
+     ylim = c(-3,1)
      )
   lines(0:9, pred.pol$lower, lty = 2)
   lines(0:9, pred.pol$upper, lty = 2)
@@ -174,10 +174,10 @@ plot(0:9, pred.pol$.fitted, type = "l",
 wrkprty.1 = glm(wrkprty ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
 wrkprty.2 = lm(wrkprty.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
 
-stargazer(wrkprty.1, wrkprty.2, type = "latex", header = FALSE,
-          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
-          dep.var.caption  = "worked in political party",
-          column.labels = c("Abs. Level", "Gap w/ Natives"))
+# stargazer(wrkprty.1, wrkprty.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "worked in political party",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
 
 # pred.pol = wrkprty.1 %>% 
 #   broom::augment(newdata = pred.pol.dat, predict = "response") %>%
@@ -234,10 +234,10 @@ wrkorg.2.plot = wrkorg.2 %>% broom::augment(.) %>%
 badge.1 = glm(badge ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
 badge.2 = lm(badge.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
 
-stargazer(badge.1, badge.2, type = "latex", header = FALSE,
-          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
-          dep.var.caption  = "Worn or displayed campaign badge/sticker",
-          column.labels = c("Abs. Level", "Gap w/ Natives"))
+# stargazer(badge.1, badge.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "Worn or displayed campaign badge/sticker",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
 
 # pred.pol = badge.1 %>% 
 #   broom::augment(newdata = pred.pol.dat, predict = "response") %>%
@@ -281,10 +281,10 @@ plot(0:9, pred.pol$.fitted, type = "l",
 pbldmn.1 = glm(pbldmn ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol, family = "binomial") # absolute level
 pbldmn.2 = lm(pbldmn.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_pol) # gap
 
-stargazer(pbldmn.1, pbldmn.2, type = "latex", header = FALSE,
-          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
-          dep.var.caption  = "Taken part in lawful public demonstration",
-          column.labels = c("Abs. Level", "Gap w/ Natives"))
+# stargazer(pbldmn.1, pbldmn.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "Taken part in lawful public demonstration",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
 
 # pred.pol = badge.1 %>% 
 #   broom::augment(newdata = pred.pol.dat, predict = "response") %>%
@@ -316,9 +316,9 @@ pred.pol = bctprd.1 %>%
          lower = .fitted - 1.96 * .se.fit)
 
 plot(0:9, pred.pol$.fitted, type = "l",
-     ylab = "Predicted Probability to have taken part in lawful public demonstration",
+     ylab = "Predicted Probability to boycotted certain products",
      xlab = "CIVIX",
-     ylim = c(-5,-1)
+     ylim = c(-5,0)
      )
   lines(0:9, pred.pol$lower, lty = 2)
   lines(0:9, pred.pol$upper, lty = 2)
@@ -843,7 +843,7 @@ stargazer(blue.1, blue.2, type = "latex", header = FALSE,
 hinctnt.1 = lm(hinctnt ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # absolute level
 hinctnt.2 = lm(hinctnt.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
 
-stargazer(hinctnt.1, blue.2, type = "latex", header = FALSE,
+stargazer(hinctnt.1, hinctnt.2, type = "latex", header = FALSE,
           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
           dep.var.caption  = "Skilled worker or not",
           column.labels = c("Abs. Level", "Gap w/ Natives"))
@@ -859,7 +859,7 @@ uemp3m.2 = lm(uemp3m.gap ~ agea + ethnic + female + edu + eubirth + civix, data 
 #           column.labels = c("Abs. Level", "Gap w/ Natives"))
 ```
 
-```{r uemp12m, results='asis', fig.height=3, fig.cap="unemployed for three months"}
+```{r uemp12m, results='asis', fig.height=3, fig.cap="unemployed for twelve months"}
 uemp12m.1 = glm(uemp12m ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
 uemp12m.2 = lm(uemp12m.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
 
@@ -874,10 +874,67 @@ pred.ses = uemp12m.1 %>%
          lower = .fitted - 1.96 * .se.fit)
 
 plot(0:9, pred.ses$.fitted, type = "l",
-     ylab = "Predicted Probability to work under contracts",
+     ylab = "Predicted Probability to be unemployed for twelve months",
      xlab = "CIVIX" ,ylim = c(-1, 1)
      )
   lines(0:9, pred.ses$lower, lty = 2)
   lines(0:9, pred.ses$upper, lty = 2)
   abline(h = 0, lty=3, col="red")
 ```
+
+```{r uemp5yr, results='asis', fig.height=3, fig.cap="unemployed for five years"}
+uemp5yr.1 = glm(uemp5yr ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+uemp5yr.2 = lm(uemp5yr.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(uemp5yr.1, uemp5yr.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "unemployed for five years",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+# pred.ses = uemp5yr.1 %>%
+#   broom::augment(newdata = ses.dat, predict = "response") %>%
+#   mutate(upper = .fitted + 1.96 * .se.fit,
+#          lower = .fitted - 1.96 * .se.fit)
+# 
+# plot(0:9, pred.ses$.fitted, type = "l",
+#      ylab = "Predicted Probability to be unemployed for twelve months",
+#      xlab = "CIVIX" ,ylim = c(-1, 1)
+#      )
+#   lines(0:9, pred.ses$lower, lty = 2)
+#   lines(0:9, pred.ses$upper, lty = 2)
+#   abline(h = 0, lty=3, col="red")
+```
+
+```{r soc.welfare, results='asis', fig.height=3, fig.cap='Depend on social benefits'}
+soc.welfare.1 = glm(soc.welfare ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses, family = "binomial") # absolute level
+soc.welfare.2 = lm(soc.welfare.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+stargazer(soc.welfare.1, soc.welfare.2, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          dep.var.caption  = "unemployed for five years",
+          column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+pred.ses = soc.welfare.1 %>%
+  broom::augment(newdata = ses.dat, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit)
+
+plot(0:9, pred.ses$.fitted, type = "l",
+     ylab = "Predicted Probability to depend on social benefits",
+     xlab = "CIVIX" ,ylim = c(-3, 1)
+     )
+  lines(0:9, pred.ses$lower, lty = 2)
+  lines(0:9, pred.ses$upper, lty = 2)
+  abline(h = 0, lty=3, col="red")
+```
+
+```{r brwmny, results='asis', fig.height=3, fig.cap='Difficulty to borrow money'}
+brwmny.1 = lm(brwmny ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # absolute level
+brwmny.2 = lm(brwmny.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_ses) # gap
+
+# stargazer(brwmny.1, brwmny.2, type = "latex", header = FALSE,
+#           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+#           dep.var.caption  = "Difficulty to borrow money",
+#           column.labels = c("Abs. Level", "Gap w/ Natives"))
+```
+

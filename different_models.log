@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  4 JAN 2020 14:34
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  4 JAN 2020 18:57
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -869,9 +869,6 @@ LaTeX Warning: Label `' multiply defined.
 
 LaTeX Warning: Label `' multiply defined.
 
-
-LaTeX Warning: Label `' multiply defined.
-
 )
 \openout1 = `different_models.aux'.
 
@@ -1056,143 +1053,147 @@ Package pdftex.def Info: different_models_files/figure-latex/contplt civix-1.pd
 f used on input line 343.
 (pdftex.def)             Requested size: 469.75386pt x 216.80946pt.
 
-Underfull \vbox (badness 10000) detected at line 422
+Underfull \vbox (badness 10000) detected at line 370
  []
 
-[4 <./different_models_files/figure-latex/contplt civix-1.pdf>] [5] [6] [7] [8]
+[4 <./different_models_files/figure-latex/contplt civix-1.pdf>]
+Underfull \vbox (badness 10000) detected at line 486
+ []
 
-<different_models_files/figure-latex/sgnptit-1.pdf, id=74, 440.64626pt x 216.81
+[5] [6]
+<different_models_files/figure-latex/sgnptit-1.pdf, id=63, 440.64626pt x 216.81
 pt>
 File: different_models_files/figure-latex/sgnptit-1.pdf Graphic file (type pdf)
 
 <use different_models_files/figure-latex/sgnptit-1.pdf>
 Package pdftex.def Info: different_models_files/figure-latex/sgnptit-1.pdf used
- on input line 672.
+ on input line 568.
 (pdftex.def)             Requested size: 440.66533pt x 216.81938pt.
-
-Underfull \vbox (badness 10000) detected at line 751
- []
-
-[9] [10] [11]
-<different_models_files/figure-latex/bctprd-1.pdf, id=89, 440.64626pt x 216.81p
+[7] [8]
+<different_models_files/figure-latex/bctprd-1.pdf, id=74, 440.64626pt x 216.81p
 t>
 File: different_models_files/figure-latex/bctprd-1.pdf Graphic file (type pdf)
 <use different_models_files/figure-latex/bctprd-1.pdf>
 Package pdftex.def Info: different_models_files/figure-latex/bctprd-1.pdf used 
-on input line 832.
+on input line 676.
 (pdftex.def)             Requested size: 440.66533pt x 216.81938pt.
 
-Underfull \vbox (badness 10000) detected at line 903
+Underfull \vbox (badness 10000) detected at line 747
+ []
+
+[9 <./different_models_files/figure-latex/sgnptit-1.pdf>] [10] [11] [12 <./diff
+erent_models_files/figure-latex/bctprd-1.pdf>] [13] [14] [15]
+Underfull \vbox (badness 10000) detected at line 1013
  []
 
 
-Overfull \vbox (2.06944pt too high) detected at line 903
+Underfull \vbox (badness 10000) detected at line 1013
  []
 
-[12 <./different_models_files/figure-latex/sgnptit-1.pdf>] [13] [14] [15 <./dif
-ferent_models_files/figure-latex/bctprd-1.pdf>] [16] [17] [18]
-Underfull \vbox (badness 10000) detected at line 1169
+[16]
+Underfull \vbox (badness 10000) detected at line 1037
  []
 
-
-Underfull \vbox (badness 10000) detected at line 1169
+[17] [18] [19]
+Overfull \vbox (0.80412pt too high) detected at line 1260
  []
 
-[19]
-Underfull \vbox (badness 10000) detected at line 1193
- []
-
-[20] [21] [22]
-Overfull \vbox (0.80412pt too high) detected at line 1416
- []
-
-[23]
-<different_models_files/figure-latex/language-1.pdf, id=166, 440.64626pt x 320.
+[20]
+<different_models_files/figure-latex/language-1.pdf, id=150, 440.64626pt x 320.
 19624pt>
 File: different_models_files/figure-latex/language-1.pdf Graphic file (type pdf
 )
 <use different_models_files/figure-latex/language-1.pdf>
 Package pdftex.def Info: different_models_files/figure-latex/language-1.pdf use
-d on input line 1418.
+d on input line 1262.
 (pdftex.def)             Requested size: 440.65189pt x 320.20033pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 1418--1420
+Underfull \hbox (badness 10000) in paragraph at lines 1262--1264
 [][] \T1/lmr/m/n/10 (+20) ##
  []
 
 
-Underfull \vbox (badness 1577) detected at line 1446
+Underfull \vbox (badness 1577) detected at line 1290
  []
 
-[24 <./different_models_files/figure-latex/language-1.pdf>]
-Underfull \vbox (badness 4805) detected at line 1516
+[21 <./different_models_files/figure-latex/language-1.pdf>]
+Underfull \vbox (badness 4805) detected at line 1360
  []
 
-[25] [26] [27] [28]
-Underfull \vbox (badness 10000) detected at line 1752
+[22] [23] [24] [25]
+Underfull \vbox (badness 10000) detected at line 1596
  []
 
-[29]
-<different_models_files/figure-latex/contract-1.pdf, id=199, 440.64626pt x 271.
+[26]
+<different_models_files/figure-latex/contract-1.pdf, id=184, 440.64626pt x 271.
 0125pt>
 File: different_models_files/figure-latex/contract-1.pdf Graphic file (type pdf
 )
 <use different_models_files/figure-latex/contract-1.pdf>
 Package pdftex.def Info: different_models_files/figure-latex/contract-1.pdf use
-d on input line 1843.
+d on input line 1687.
 (pdftex.def)             Requested size: 440.65862pt x 271.0201pt.
-[30] [31]
-Underfull \vbox (badness 10000) detected at line 1988
+[27] [28]
+Underfull \vbox (badness 10000) detected at line 1832
  []
 
-[32 <./different_models_files/figure-latex/contract-1.pdf>] [33] [34] [35]
-<different_models_files/figure-latex/skill-1.pdf, id=236, 440.64626pt x 216.81p
+[29 <./different_models_files/figure-latex/contract-1.pdf>] [30] [31] [32]
+<different_models_files/figure-latex/skill-1.pdf, id=221, 440.64626pt x 216.81p
 t>
 File: different_models_files/figure-latex/skill-1.pdf Graphic file (type pdf)
 <use different_models_files/figure-latex/skill-1.pdf>
 Package pdftex.def Info: different_models_files/figure-latex/skill-1.pdf used o
-n input line 2067.
+n input line 1911.
 (pdftex.def)             Requested size: 440.66533pt x 216.81938pt.
 
-Underfull \vbox (badness 10000) detected at line 2155
+Underfull \vbox (badness 10000) detected at line 1999
  []
 
-[36 <./different_models_files/figure-latex/skill-1.pdf>] [37]
-Overfull \vbox (0.16515pt too high) detected at line 2224
+[33 <./different_models_files/figure-latex/skill-1.pdf>] [34]
+Overfull \vbox (0.16515pt too high) detected at line 2068
  []
 
-[38]
-Overfull \vbox (2.095pt too high) detected at line 2289
+[35]
+Overfull \vbox (2.095pt too high) detected at line 2133
  []
 
-[39]
-<different_models_files/figure-latex/uemp12m-1.pdf, id=264, 440.64626pt x 216.8
+[36]
+<different_models_files/figure-latex/uemp12m-1.pdf, id=248, 440.64626pt x 216.8
 1pt>
 File: different_models_files/figure-latex/uemp12m-1.pdf Graphic file (type pdf)
 
 <use different_models_files/figure-latex/uemp12m-1.pdf>
 Package pdftex.def Info: different_models_files/figure-latex/uemp12m-1.pdf used
- on input line 2293.
+ on input line 2137.
 (pdftex.def)             Requested size: 440.66533pt x 216.81938pt.
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2298.
-[40 <./different_models_files/figure-latex/uemp12m-1.pdf>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2298.
+[37 <./different_models_files/figure-latex/uemp12m-1.pdf>] [38] [39]
+<different_models_files/figure-latex/soc.welfare-1.pdf, id=272, 440.64626pt x 2
+16.81pt>
+File: different_models_files/figure-latex/soc.welfare-1.pdf Graphic file (type 
+pdf)
+<use different_models_files/figure-latex/soc.welfare-1.pdf>
+Package pdftex.def Info: different_models_files/figure-latex/soc.welfare-1.pdf 
+used on input line 2297.
+(pdftex.def)             Requested size: 440.66533pt x 216.81938pt.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2314.
+[40 <./different_models_files/figure-latex/soc.welfare-1.pdf>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2314.
 (./different_models.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2298.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2298.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2314.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2314.
 
 Package rerunfilecheck Info: File `different_models.out' has not changed.
 (rerunfilecheck)             Checksum: 3D3DC06D63C05E114291A5B46C22BFAE;497.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2298.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 2314.
  ) 
 Here is how much of TeX's memory you used:
- 12929 strings out of 492995
- 188786 string characters out of 6132704
- 326715 words of memory out of 5000000
- 16213 multiletter control sequences out of 15000+600000
+ 12934 strings out of 492995
+ 189044 string characters out of 6132704
+ 326700 words of memory out of 5000000
+ 16218 multiletter control sequences out of 15000+600000
  45782 words of font info for 54 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  32i,10n,38p,637b,455s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -1211,10 +1212,10 @@ pe1/public/lm/lmri12.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public
 pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/
 local/texlive/2017/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texl
 ive/2017/texmf-dist/fonts/type1/public/lm/lmtti10.pfb>
-Output written on different_models.pdf (40 pages, 306688 bytes).
+Output written on different_models.pdf (40 pages, 312672 bytes).
 PDF statistics:
- 343 PDF objects out of 1000 (max. 8388607)
- 266 compressed objects within 3 object streams
+ 351 PDF objects out of 1000 (max. 8388607)
+ 271 compressed objects within 3 object streams
  69 named destinations out of 1000 (max. 500000)
- 10300 words of extra memory for PDF output out of 12000 (max. 10000000)
+ 10305 words of extra memory for PDF output out of 12000 (max. 10000000)
 
