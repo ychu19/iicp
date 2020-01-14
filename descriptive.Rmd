@@ -3416,10 +3416,10 @@ ggplot(health.1,aes(y=var)) +
 ```
 
 ```{r dscrgrp, fig.height=1.5, fig.cap='Whether a member of a group discriminated against in this country (1 yes)'}
-dscrgrp.h.1 = glm(dscrgrp ~ agea + ethnic + female + edu + eubirth, data = soc_h, family = 'binomial') # absolute level
-dscrgrp.h.2 = lm(dscrgrp.gap ~ agea + ethnic + female + edu + eubirth, data = soc_h) # gap
-dscrgrp.l.1 = glm(dscrgrp ~ agea + ethnic + female + edu + eubirth, data = soc_l, family = 'binomial') # absolute level
-dscrgrp.l.2 = lm(dscrgrp.gap ~ agea + ethnic + female + edu + eubirth, data = soc_l) # gap
+dscrgrp.h.1 = glm(dscrgrp ~ agea + female + edu + eubirth, data = soc_h, family = 'binomial') # absolute level
+dscrgrp.h.2 = lm(dscrgrp.gap ~ agea + female + edu + eubirth, data = soc_h) # gap
+dscrgrp.l.1 = glm(dscrgrp ~ agea + female + edu + eubirth, data = soc_l, family = 'binomial') # absolute level
+dscrgrp.l.2 = lm(dscrgrp.gap ~ agea + female + edu + eubirth, data = soc_l) # gap
 
 # absolute.h = as.vector(c(dscrgrp.h.1$coefficients[1],confint(dscrgrp.h.1)[1,]))
 # absolute.l = as.vector(c(dscrgrp.l.1$coefficients[1],confint(dscrgrp.l.1)[1,]))
