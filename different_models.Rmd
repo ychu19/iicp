@@ -144,7 +144,7 @@ pol.4 = lm(contplt.gap ~ agea + ethnic + female + edu + eubirth + civix.d, data 
 
 stargazer(pol.1, pol.2, pol.3, pol.4, type = "latex", header = FALSE,
           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
-          dep.var.caption  = "worked in political party or group",
+          dep.var.caption  = "contacted politicians",
           column.labels = c("Abs. Level", "Gap w/ Natives"))
 
 pred.pol.dat = with(ess_pol, data.frame(agea = mean(agea, na.rm = T),
@@ -180,8 +180,8 @@ wrkprty.2 = lm(wrkprty.gap ~ agea + ethnic + female + edu + eubirth + civix, dat
 wrkprty.3 = glm(wrkprty ~ agea + ethnic + female + edu + eubirth + civix.d, data = ess_pol, family = "binomial") # absolute level
 wrkprty.4 = lm(wrkprty.gap ~ agea + ethnic + female + edu + eubirth + civix.d, data = ess_pol) # gap
 
-stargazer(wrkprty.3, wrkprty.4, type = "latex", header = FALSE,
-          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX.d"),
+stargazer(wrkprty.1, wrkprty.2, wrkprty.3, wrkprty.4, type = "latex", header = FALSE,
+          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe"),
           dep.var.caption  = "worked in political party",
           column.labels = c("Abs. Level", "Gap w/ Natives"))
 
@@ -293,7 +293,7 @@ pbldmn.2 = lm(pbldmn.gap ~ agea + ethnic + female + edu + eubirth + civix, data 
 pbldmn.3 = glm(pbldmn ~ agea + ethnic + female + edu + eubirth + civix.d, data = ess_pol, family = "binomial") # absolute level
 pbldmn.4 = lm(pbldmn.gap ~ agea + ethnic + female + edu + eubirth + civix.d, data = ess_pol) # gap
 
-stargazer(pbldmn.1, pbldmn.2, type = "latex", header = FALSE,
+stargazer(pbldmn.1, pbldmn.2, pbldmn.3, pbldmn.4, type = "latex", header = FALSE,
           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
           dep.var.caption  = "Taken part in lawful public demonstration",
           column.labels = c("Abs. Level", "Gap w/ Natives"))
@@ -554,13 +554,13 @@ stargazer(health.1, health.2, health.3, health.4, type = "latex", header = FALSE
 ```
 
 ```{r dscrgrp, results='asis'}
-dscrgrp.1 = glm(dscrgrp ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc, family = "binomial") # absolute level
-dscrgrp.2 = lm(dscrgrp.gap ~ agea + ethnic + female + edu + eubirth + civix, data = ess_soc) # gap
-dscrgrp.3 = glm(dscrgrp ~ agea + ethnic + female + edu + eubirth + civix.d, data = ess_soc, family = "binomial") # absolute level
-dscrgrp.4 = lm(dscrgrp.gap ~ agea + ethnic + female + edu + eubirth + civix.d, data = ess_soc) # gap
+dscrgrp.1 = glm(dscrgrp ~ agea + female + edu + eubirth + civix, data = ess_soc, family = "binomial") # absolute level
+dscrgrp.2 = lm(dscrgrp.gap ~ agea + female + edu + eubirth + civix, data = ess_soc) # gap
+dscrgrp.3 = glm(dscrgrp ~ agea + female + edu + eubirth + civix.d, data = ess_soc, family = "binomial") # absolute level
+dscrgrp.4 = lm(dscrgrp.gap ~ agea + female + edu + eubirth + civix.d, data = ess_soc) # gap
 
 stargazer(dscrgrp.1, dscrgrp.2, dscrgrp.3, dscrgrp.4, type = "latex", header = FALSE,
-          covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
+          covariate.labels = c("Age", "Female", "Education", "Born in Europe", "CIVIX"),
           dep.var.caption  = "subjective general health",
           column.labels = c("Abs. Level", "Gap w/ Natives"))
 
