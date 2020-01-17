@@ -361,6 +361,8 @@ stargazer(tvpol.1, tvpol.2, tvpol.3, tvpol.4, type = "latex", header = FALSE,
           covariate.labels = c("Age", "Ethnicity", "Female", "Education", "Born in Europe", "CIVIX"),
           dep.var.caption  = "Watching TV for News about Politics",
           column.labels = c("Abs. Level", "Gap w/ Natives"))
+
+summary(tvpol.2)
 ```
 
 ```{r rdpol, results='asis'}
