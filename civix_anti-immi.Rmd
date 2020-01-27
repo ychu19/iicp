@@ -1,0 +1,414 @@
+---
+title: "Anti-immigrant and CIVIX"
+author: "Yuan-Ning Chu"
+date: "1/24/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plm) # fixed effect
+library(ggplot2)
+```
+
+```{r ess, echo=FALSE, message=FALSE, warning=FALSE}
+ess_2002 = haven::read_stata("ESS1e06_6.dta")
+ess_2004 = haven::read_stata("ESS2e03_6.dta")
+ess_2006 = haven::read_stata("ESS3e03_7.dta")
+ess_2008 = haven::read_stata("ESS4e04_5.dta")
+ess_2010 = haven::read_stata("ESS5e03_4.dta")
+```
+
+```{r ess_yr, echo=FALSE, message=FALSE, warning=FALSE}
+ess_2002 = ess_2002 %>% 
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2004 = ess_2004 %>% 
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair,imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2006 = ess_2006 %>% 
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2008 = ess_2008 %>% 
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2010 = ess_2010 %>% 
+  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "livecnta" = "livecntr","edulvlb"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+  ess_2010$livecntr = ess_2010$livecntr - 2010
+  ess_2010$livecntr = ifelse(ess_2010$livecntr >= 1, 1,
+                           ifelse(ess_2010$livecntr %in% c(-1:-5), 2,
+                                  ifelse(ess_2010$livecntr %in% c(-6:-10), 3,
+                                         ifelse(ess_2010$livecntr %in% c(-11:-20), 4,
+                                                ifelse(ess_2010$livecntr < -20, 5, NA)))))
+  ess_2010$polcmpl = NA
+  ess_2010$poldcs = NA
+
+```
+
+```{r ess_civix, echo=FALSE, message=FALSE, warning=FALSE}
+ess_raw = rbind(ess_2002, ess_2004, ess_2006, ess_2008, ess_2010)
+ess_raw$sec.immi = ifelse(ess_raw$facntr == 2 | ess_raw$mocntr == 2, 1, 0)
+ess_raw$ethnic = ifelse(ess_raw$ethnic == 1, 1,
+                        ifelse(ess_raw$ethnic == 2, 0, NA))
+ess_raw$citizen = ifelse(ess_raw$ctzcntr == 1, 1,
+                         ifelse(ess_raw$ctzcntr == 2, 0, NA))
+ess_raw$residence = ifelse(ess_raw$livecntr <= 3, 1, 0) # 1 = lived less than 10 yrs, 0 = lived more than 10 yrs
+ess_raw$fborn = ifelse(ess_raw$fborn == 1, 0, 1) # now 1 as foreign born, 0 as native born
+ess_raw$birthplace = ifelse(ess_raw$birthplace %in% c(66,77,88,99,"02","03","04","06"), NA, ess_raw$birthplace)
+  ess_raw = ess_raw[complete.cases(ess_raw$birthplace),]
+  eu_member = c("BE", "FR", "DE", "IT", "LU", "NL", "DK", "IE", "GB", "GR", "PT", "ES","AT","SE")
+ess_raw$eubirth = ifelse(ess_raw$birthplace %in% eu_member, 1, 0)
+ess_raw$female = ifelse(ess_raw$gndr == 2, 1, 
+                        ifelse(ess_raw$gndr == 1, 0, NA))
+ess_raw$edu = ifelse(ess_raw$edu > 5, NA, ess_raw$edu)
+
+ess_raw$polintr = ifelse(ess_raw$polintr > 4, NA, ess_raw$polintr)
+# table(ess_raw$polcmpl) whether politics are too complicated to understand, 5 as always, 1 as never
+# table(ess_raw$poldcs) how difficult it is to make mind up about political issues, 5 as very easy, 1 as very difficult
+ess_raw$poldcs = ifelse(ess_raw$poldcs == 5, 1, # now 1 as easy
+                        ifelse(ess_raw$poldcs == 4, 2, 
+                               ifelse(ess_raw$poldcs == 3, 3, 
+                                      ifelse(ess_raw$poldcs == 2, 4, 
+                                             ifelse(ess_raw$poldcs == 1, 5, ess_raw$poldcs))))) # 5 as difficult
+ess_raw$hincfel = ifelse(ess_raw$hincfel > 4, NA, ess_raw$hincfel)
+ess_raw$ppltrst = ifelse(ess_raw$ppltrst > 10, NA, ess_raw$ppltrst) # 0 as can't be too careful, 10 as most people can be trusted
+ess_raw$pplfair = ifelse(ess_raw$pplfair > 10, NA, ess_raw$pplfair) # 0 as most people take advantage, 10 as most people are fair
+ess_raw$employ = ifelse(ess_raw$uempla == 0, 1, 0) # 1 = employed, 0 = unemployed
+```
+
+```{r anti-immigrant, message=FALSE, warning=FALSE, echo=FALSE}
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(sameimavg = mean(sameim, na.rm = T))
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(diffimavg = mean(diffim, na.rm = T))
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(poorimavg = mean(poorim, na.rm = T))
+ess_raw$anti1 = (ess_raw$sameimavg + ess_raw$diffimavg + ess_raw$poorimavg)/3 
+ess_raw$anti3 = (ess_raw$sameimavg + ess_raw$diffimavg + ess_raw$poorimavg)/3 / 4 * 10 # rescale
+
+ess_raw$ecoim <- as.numeric(ess_raw$ecoim)
+library(car)
+ess_raw$ecoim = recode(ess_raw$ecoim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(ecoimavg = mean(ecoim, na.rm = T))
+
+ess_raw$cultim <- as.numeric(ess_raw$cultim)
+# library(car)
+ess_raw$cultim = recode(ess_raw$cultim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(cultimavg = mean(cultim, na.rm = T))
+
+ess_raw$liveim <- as.numeric(ess_raw$liveim)
+# library(car)
+ess_raw$liveim = recode(ess_raw$liveim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(liveimavg = mean(liveim, na.rm = T))
+ess_raw$anti2 = (ess_raw$ecoimavg + ess_raw$cultimavg + ess_raw$liveimavg)/3
+```
+
+```{r civix, message=FALSE, warning=FALSE, echo=FALSE}
+# civix.cntry = c("AT", "BE", "DK", "FI", "FR", "DE", "GR", "IE", "NL", "PT", "ES", "SE", "GB")
+#   civix.sc =   as.numeric( c(5.5, 1.25, 8.25,  2.5,    5,     7, 5.25,    1, 6.25, 1.25, 2.5, 0, 5.5))
+#   civix.1 = as.data.frame(t(rbind(civix.cntry, civix.sc)))
+#   colnames(civix.1) = c("cntry", "civix")
+#   civix.1$civix = as.numeric(civix.1$civix)
+library(readxl)
+civix.1 = read_xlsx("CIVIXscores.xlsx")
+
+ess_raw = ess_raw %>% left_join(civix.1, by = 'cntry') 
+ess_raw = ess_raw %>% mutate(civix.d = ifelse(civix > 2.5, 1, 0))
+```
+
+
+```{r mean, message=FALSE, warning=FALSE, echo=FALSE}
+ess_mean = ess_raw %>% filter(citizen == 1) %>% group_by(cntry) %>% 
+  select(cntry,polintr, hincfel, employ, ppltrst, pplfair, polcmpl, poldcs) %>%
+  summarise(mean.poli = mean(polintr, na.rm = TRUE),
+            mean.employ = mean(employ, na.rm = TRUE),
+            mean.hincfel = mean(hincfel, na.rm = TRUE),
+            mean.ppltrst = mean(ppltrst, na.rm = TRUE),
+            mean.pplfair = mean(pplfair, na.rm = TRUE),
+            mean.polcmpl = mean(polcmpl, na.rm = TRUE),
+            mean.poldcs = mean(poldcs, na.rm = TRUE))
+
+ess_tenyr = ess_raw %>% filter(residence == 1)
+
+ess_tenyr = ess_tenyr %>% left_join(ess_mean, by='cntry')
+ess_raw = ess_raw %>% left_join(ess_mean, by='cntry')
+
+ess_h.tenyr = ess_tenyr %>% filter(cntry %in% c("DK", "NL", "DE", "AT", "FR", "GB", "GR"))
+ess_l.tenyr = ess_tenyr %>% filter(cntry %in% c("IE", "SE", "BE", "PT", "ES", "FI","LU", "IT"))
+```
+
+```{r gap, message=FALSE, warning=FALSE, echo=FALSE}
+
+ess_tenyr = ess_tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+ess_h.tenyr = ess_h.tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+
+ess_l.tenyr = ess_l.tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs
+  )
+```
+
+
+# Two-by-two table
+
+```{r 2-by-2, message=FALSE, warning=FALSE}
+t1 = ess_h.tenyr %>% group_by(cntry) %>% filter(anti1 > 2)
+table(t1$cntry) # high CIVIX high anti-immigrant sentiments
+t2 = ess_l.tenyr %>% group_by(cntry) %>% filter(anti1 > 2)
+table(t2$cntry) # low CIVIX high anti-immigrant sentiments
+t3 = ess_l.tenyr %>% group_by(cntry) %>% filter(anti1 < 2)
+table(t3$cntry) # low CIVIX low anti-immigrant sentiments
+```
+```{r anti3, message=FALSE, warning=FALSE}
+t4 = ess_h.tenyr %>% group_by(cntry) %>% filter(anti3 > 5)
+table(t4$cntry)
+t5 = ess_l.tenyr %>% group_by(cntry) %>% filter(anti3 > 5)
+table(t5$cntry)
+t6 = ess_l.tenyr %>% group_by(cntry) %>% filter(anti3 < 5)
+table(t6$cntry)
+```
+
+```{r anti2, message=FALSE, warning=FALSE, include=FALSE}
+t7 = ess_h.tenyr %>% group_by(cntry) %>% filter(anti2 > 5)
+table(t7$cntry)
+t8 = ess_h.tenyr %>% group_by(cntry) %>% filter(anti2 < 5)
+table(t8$cntry)
+t9 = ess_l.tenyr %>% group_by(cntry) %>% filter(anti2 > 5)
+table(t9$cntry)
+t10 = ess_l.tenyr %>% group_by(cntry) %>% filter(anti2 < 5)
+table(t10$cntry)
+```
+
+# Interactions
+
+## Political Interests
+
+```{r polintr.gap, message=FALSE, warning=FALSE}
+summary(ess_tenyr$polintr) # political interests
+summary(ess_tenyr$poli.gap) # gap with native citizens
+```
+
+```{r polintr, message=FALSE, warning=FALSE, echo=FALSE}
+polintr.1 = lm(polintr ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr)
+summary(polintr.1)
+polintr.2 = lm(poli.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr)
+summary(polintr.2)
+```
+
+```{r predict.polintr, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.cap='Effect of CIVIX conditional on Anti-immigrant Sentiments: Interests in Politics (Abs. Level)', fig.height=3.5}
+# dat.c = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),
+#                                         ethnic = mean(ethnic, na.rm = T),
+#                                         female = mean(female, na.rm = T),
+#                                         eubirth = mean(eubirth, na.rm = T),
+#                                         edu = mean(edu, na.rm = T),
+#                                         citizen = mean(citizen, na.rm = T),
+#                                         civix = 1:10
+#                                    ))
+# dat.anti1 = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),
+#                                         ethnic = mean(ethnic, na.rm = T),
+#                                         female = mean(female, na.rm = T),
+#                                         eubirth = mean(eubirth, na.rm = T),
+#                                         edu = mean(edu, na.rm = T),
+#                                         citizen = mean(citizen, na.rm = T),
+#                                         anti1 = 1:3
+# ))
+
+library(interplot)
+interplot(polintr.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("polintr1.jpeg")
+```
+
+```{r polintr gap plot, message=FALSE, warning=FALSE, fig.cap='Effect of CIVIX conditional on Anti-immigrant Sentiments: Interests in Politics (Gap w/Natives)', fig.height=3.5, echo=FALSE}
+
+interplot(polintr.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiment") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1,1.5) + xlim(1.8, 2.6) + 
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("polintr2.jpeg")
+```
+
+## Politics as Complicated
+
+```{r polcmpl.des, message=FALSE, warning=FALSE}
+summary(ess_tenyr$polcmpl) # absolute level
+summary(ess_tenyr$polcmpl.gap) # gap w/natives
+```
+
+
+```{r polcmpl, message=FALSE, warning=FALSE, echo=FALSE}
+polcmpl.1 = lm(polcmpl ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # absolute level
+summarise(polcmpl.1)
+polcmpl.2 = lm(polcmpl.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/ natives
+summarise(polcmpl.2)
+```
+
+```{r polcmpl.plot.1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.cap='Effect of CIVIX conditional on Anti-immigrant Sentiments: Politics as Complicated (Abs. Level)', fig.height=3.5}
+
+interplot(polcmpl.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("polcmpl1.jpeg")
+```
+
+
+```{r polcmpl.plot.2, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.cap='Effect of CIVIX conditional on Anti-immigrant Sentiments: Politics as Complicated (Gap w/Natives)', fig.height=3.5}
+
+interplot(polcmpl.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("polcmpl2.jpeg")
+```
+
+## Difficulty in making political decisions
+
+```{r poldcs.des, message=FALSE, warning=FALSE}
+summary(ess_tenyr$poldcs) # absolute level
+summary(ess_tenyr$poldcs.gap)
+```
+
+```{r poldcs, message=FALSE, warning=FALSE, echo=FALSE}
+poldcs.1 = lm(poldcs ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # absolute level
+summarise(poldcs.1)
+poldcs.2 = lm(poldcs.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
+summarise(poldcs.2)
+```
+
+```{r poldcs.1.plot, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(poldcs.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("poldcs1.jpeg")
+```
+
+```{r poldcs.2.plot, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(poldcs.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("poldcs2.jpeg")
+```
+
+## Employment status
+
+```{r}
+summary(ess_tenyr$employ)
+summary(ess_tenyr$employ.gap)
+```
+
+```{r employ, message=FALSE, warning=FALSE, echo=FALSE}
+employ.1 = glm(employ ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, family = "binomial" , data = ess_tenyr) # absolute level
+summary(employ.1)
+employ.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
+summary(employ.2)
+```
+
+```{r employ.1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(employ.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("employ1.jpeg")
+```
+
+```{r employ.2, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(employ.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("employ2.jpeg")
+```
+
+## Subjective financial status
+
+```{r}
+summary(ess_tenyr$hincfel)
+summary(ess_tenyr$hincfel.gap)
+```
+
+```{r hincfel}
+hincfel.1 = lm(hincfel ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, data = ess_tenyr) # absolute level
+summary(hincfel.1)
+hincfel.2 = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
+summary(hincfel.2)
+```
+
+```{r hincfel.1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(hincfel.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("hincfel1.jpeg")
+```
+
+```{r hincfel.2, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(hincfel.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("hincfel2.jpeg")
+```
