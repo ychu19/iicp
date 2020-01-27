@@ -23,22 +23,22 @@ ess_2010 = haven::read_stata("ESS5e03_4.dta")
 
 ```{r ess_yr, echo=FALSE, message=FALSE, warning=FALSE}
 ess_2002 = ess_2002 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
   plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
   ess_2002 = ess_2002 %>% mutate(hinctnt = hinctnt/12*10) # rescale to fit data from 2008 and 2010
 ess_2004 = ess_2004 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair,imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair,imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
   plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
   ess_2004 = ess_2004 %>% mutate(hinctnt = hinctnt/12*10)
 ess_2006 = ess_2006 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
   plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
   ess_2006 = ess_2006 %>% mutate(hinctnt = hinctnt/12*10)
 ess_2008 = ess_2008 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnta) %>%
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnta) %>%
   plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim", "hinctnta" = "hinctnt"))
 ess_2010 = ess_2010 %>% 
-  select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnta) %>%
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnta) %>%
   plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "livecnta" = "livecntr","edulvlb"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim", "hinctnta" = "hinctnt"))
   ess_2010$livecntr = ess_2010$livecntr - 2010
   ess_2010$livecntr = ifelse(ess_2010$livecntr >= 1, 1,
@@ -95,6 +95,10 @@ ess_raw <- ess_raw %>%
 ess_raw$anti1 = (ess_raw$sameimavg + ess_raw$diffimavg + ess_raw$poorimavg)/3 
 ess_raw$anti3 = (ess_raw$sameimavg + ess_raw$diffimavg + ess_raw$poorimavg)/3 / 4 * 10 # rescale
 
+ess_raw = ess_raw %>% mutate(
+  anti.b = ifelse(anti1 > 2.230, 1, 0)
+)
+
 ess_raw$ecoim <- as.numeric(ess_raw$ecoim)
 library(car)
 ess_raw$ecoim = recode(ess_raw$ecoim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
@@ -134,7 +138,7 @@ ess_raw = ess_raw %>% mutate(civix.d = ifelse(civix > 2.5, 1, 0))
 
 ```{r mean, message=FALSE, warning=FALSE, echo=FALSE}
 ess_mean = ess_raw %>% filter(citizen == 1) %>% group_by(cntry) %>% 
-  select(cntry,polintr, hincfel, employ, ppltrst, pplfair, polcmpl, poldcs, hinctnt) %>%
+  dplyr::select(cntry,polintr, hincfel, employ, ppltrst, pplfair, polcmpl, poldcs, hinctnt) %>%
   summarise(mean.poli = mean(polintr, na.rm = TRUE),
             mean.employ = mean(employ, na.rm = TRUE),
             mean.hincfel = mean(hincfel, na.rm = TRUE),
@@ -149,17 +153,6 @@ ess_tenyr = ess_raw %>% filter(residence == 1)
 ess_tenyr = ess_tenyr %>% left_join(ess_mean, by='cntry')
 ess_raw = ess_raw %>% left_join(ess_mean, by='cntry')
 
-ess_h.tenyr = ess_tenyr %>% filter(cntry %in% c("DK", "NL", "DE", "AT", "FR", "GB", "GR"))
-ess_l.tenyr = ess_tenyr %>% filter(cntry %in% c("IE", "SE", "BE", "PT", "ES", "FI","LU", "IT"))
-
-ess_hh = ess_tenyr %>% filter((civix.d = 1 & anti1 > 2.230))
-ess_hl = ess_tenyr %>% filter((civix.d = 1 & anti1 <= 2.230))
-ess_lh = ess_tenyr %>% filter((civix.d = 0 & anti1 > 2.230))
-ess_ll = ess_tenyr %>% filter((civix.d = 0 & anti1 <= 2.230))
-```
-
-```{r gap, message=FALSE, warning=FALSE, echo=FALSE}
-
 ess_tenyr = ess_tenyr %>% mutate(
   poli.gap = polintr - mean.poli, 
   employ.gap = employ - mean.employ,
@@ -171,27 +164,64 @@ ess_tenyr = ess_tenyr %>% mutate(
   hinctnt.gap = hinctnt - mean.hinctnt
   )
 
-ess_h.tenyr = ess_h.tenyr %>% mutate(
-  poli.gap = polintr - mean.poli, 
-  employ.gap = employ - mean.employ,
-  hincfel.gap = hincfel - mean.hincfel, 
-  ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair, 
-  polcmpl.gap = polcmpl - mean.polcmpl,
-  poldcs.gap = poldcs - mean.poldcs
-  )
+ess_h.tenyr = ess_tenyr %>% filter(civix.d == 1)
+ess_l.tenyr = ess_tenyr %>% filter(civix.d == 0)
 
-ess_l.tenyr = ess_l.tenyr %>% mutate(
-  poli.gap = polintr - mean.poli, 
-  employ.gap = employ - mean.employ,
-  hincfel.gap = hincfel - mean.hincfel, 
-  ppltrst.gap = ppltrst - mean.ppltrst,
-  pplfair.gap = pplfair - mean.pplfair, 
-  polcmpl.gap = polcmpl - mean.polcmpl,
-  poldcs.gap = poldcs - mean.poldcs
-  )
+ess_anti.h = ess_tenyr %>% filter(anti1 > 2.230)
+ess_anti.l = ess_tenyr %>% filter(anti1 <= 2.230)
+
+ess_hh = ess_tenyr %>% filter(civix.d == 1 & anti1 > 2.230)
+ess_hl = ess_tenyr %>% filter(civix.d == 1 & anti1 <= 2.230)
+ess_lh = ess_tenyr %>% filter(civix.d == 0 & anti1 > 2.230)
+ess_ll = ess_tenyr %>% filter(civix.d == 0 & anti1 <= 2.230)
 ```
 
+```{r, echo=FALSE}
+dat.hh = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T),
+                                        citizen = mean(citizen, na.rm = T),
+                                   anti1 = 2.23:3,
+                                   civix.d = 1
+                                   ))
+dat.hl = with(ess_hl, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T),
+                                        citizen = mean(citizen, na.rm = T),
+                                   anti1 = 2:2.23,
+                                   civix.d = 1
+                                   ))
+dat.lh = with(ess_lh, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T),
+                                        citizen = mean(citizen, na.rm = T),
+                                   anti1 = 2.23:3,
+                                   civix.d = 0
+                                   ))
+dat.ll = with(ess_ll, data.frame(agea = mean(agea, na.rm = T),
+                                        ethnic = mean(ethnic, na.rm = T),
+                                        female = mean(female, na.rm = T),
+                                        eubirth = mean(eubirth, na.rm = T),
+                                        edu = mean(edu, na.rm = T),
+                                        citizen = mean(citizen, na.rm = T),
+                                   anti1 = 2:2.23,
+                                   civix.d = 0
+                                   ))
+# dat.anti1 = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),
+#                                         ethnic = mean(ethnic, na.rm = T),
+#                                         female = mean(female, na.rm = T),
+#                                         eubirth = mean(eubirth, na.rm = T),
+#                                         edu = mean(edu, na.rm = T),
+#                                         citizen = mean(citizen, na.rm = T),
+#                                         anti1 = 1:3
+# ))
+```
 
 # Two-by-two table
 
@@ -245,23 +275,97 @@ interplot(polintr.2, var1 = "civix.d", var2 = "anti1") +
 ggsave("polintr2.jpeg")
 ```
 
-```{r}
-dat.c = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),
-                                        ethnic = mean(ethnic, na.rm = T),
-                                        female = mean(female, na.rm = T),
-                                        eubirth = mean(eubirth, na.rm = T),
-                                        edu = mean(edu, na.rm = T),
-                                        citizen = mean(citizen, na.rm = T),
-                                        civix = 1:10
-                                   ))
-dat.anti1 = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),
-                                        ethnic = mean(ethnic, na.rm = T),
-                                        female = mean(female, na.rm = T),
-                                        eubirth = mean(eubirth, na.rm = T),
-                                        edu = mean(edu, na.rm = T),
-                                        citizen = mean(citizen, na.rm = T),
-                                        anti1 = 1:3
-))
+```{r, fig.width=6, fig.height=3}
+
+library(broom)
+
+pred.hh.1 = polintr.1 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.1 = polintr.1 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.1 = polintr.1 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.1 = polintr.1 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.1 = rbind(pred.hh.1, pred.hl.1, pred.lh.1, pred.ll.1)
+pred.1 = pred.1 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.1 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.1) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(2,3)+ 
+  xlab("Predicted Value of Political Interests") +
+  ylab("")
+  
+ggsave("pred.polintr.1.jpeg")  
+
+
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+
+pred.hh.2 = polintr.2 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.2 = polintr.2 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.2 = polintr.2 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.2 = polintr.2 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.2 = rbind(pred.hh.2,  pred.lh.2, pred.hl.2, pred.ll.2)
+pred.2 = pred.2 %>% mutate(group = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.2 = pred.2 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+ggplot(data = pred.2) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(-0.25,0.25) + 
+  xlab("Predicted Value of Political Interests (gap w/natives)") +
+  ylab("")
+  
+ggsave("pred.polintr.2.jpeg")  
 ```
 
 
@@ -303,6 +407,98 @@ interplot(polcmpl.2, var1 = "civix.d", var2 = "anti1") +
 ggsave("polcmpl2.jpeg")
 ```
 
+
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.1 = polcmpl.1 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.1 = polcmpl.1 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.1 = polcmpl.1 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.1 = polcmpl.1 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.1 = rbind(pred.hh.1, pred.hl.1, pred.lh.1, pred.ll.1)
+pred.1 = pred.1 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.1 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.1) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(2.5,3.5)+ 
+  xlab("Predicted Value of Politics as Complicated") +
+  ylab("")
+  
+ggsave("pred.polcmpl.1.jpeg")  
+
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.2 = polcmpl.2 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.2 = polcmpl.2 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.2 = polcmpl.2 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.2 = polcmpl.2 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.2 = rbind(pred.hh.2, pred.hl.2, pred.lh.2, pred.ll.2)
+pred.2 = pred.2 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.2 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+ggplot(data = pred.2) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(-0.5,0.5)+ 
+  xlab("Predicted Value of Politics as Complicated (gap w/natives") +
+  ylab("")
+  
+ggsave("pred.polcmpl.2.jpeg")  
+
+```
+
+
 ## Difficulty in making political decisions
 
 ```{r poldcs.des, message=FALSE, warning=FALSE}
@@ -339,6 +535,96 @@ interplot(poldcs.2, var1 = "civix.d", var2 = "anti1") +
 ggsave("poldcs2.jpeg")
 ```
 
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.1 = poldcs.1 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.1 = poldcs.1 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.1 = poldcs.1 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.1 = poldcs.1 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.1 = rbind(pred.hh.1, pred.hl.1, pred.lh.1, pred.ll.1)
+pred.1 = pred.1 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.1 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.1) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(2.5,3.5)+ 
+  xlab("Predicted Value of Difficulty in Poli. Decisions") +
+  ylab("")
+  
+ggsave("pred.poldcs.1.jpeg")  
+
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.2 = poldcs.2 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.2 = poldcs.2 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.2 = poldcs.2 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.2 = poldcs.2 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.2 = rbind(pred.hh.2, pred.hl.2, pred.lh.2, pred.ll.2)
+pred.2 = pred.2 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.2 = pred.2 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.2) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(-0.5,0.5)+ 
+  xlab("Predicted Value of Difficulty in Poli. Decisions") +
+  ylab("")
+  
+ggsave("pred.poldcs.2.jpeg")  
+
+```
+
 ## Employment status
 
 ```{r}
@@ -347,7 +633,7 @@ summary(ess_tenyr$employ.gap)
 ```
 
 ```{r employ, message=FALSE, warning=FALSE, echo=FALSE}
-employ.1 = glm(employ ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, family = "binomial" , data = ess_tenyr) # absolute level
+employ.1 = lm(employ ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, data = ess_tenyr) # absolute level
 summary(employ.1)
 employ.2 = lm(employ.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
 summary(employ.2)
@@ -373,6 +659,96 @@ interplot(employ.2, var1 = "civix.d", var2 = "anti1") +
   geom_hline(yintercept = 0, linetype = 3)
 
 ggsave("employ2.jpeg")
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.1 = employ.1 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.1 = employ.1 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.1 = employ.1 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.1 = employ.1 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.1 = rbind(pred.hh.1, pred.hl.1, pred.lh.1, pred.ll.1)
+pred.1 = pred.1 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.1 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.1) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(0.5,1)+ 
+  xlab("Predicted Probability of Employment") +
+  ylab("")
+  
+ggsave("pred.employ.1.jpeg")  
+
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.2 = employ.2 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.2 = employ.2 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.2 = employ.2 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.2 = employ.2 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.2 = rbind(pred.hh.2, pred.hl.2, pred.lh.2, pred.ll.2)
+pred.2 = pred.2 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.2 = pred.2 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.2) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(-0.25,0.25)+ 
+  xlab("Predicted Probability of Employment (gap w/natives)") +
+  ylab("")
+  
+ggsave("pred.employ.2.jpeg")  
+
 ```
 
 ## Subjective financial status
@@ -409,6 +785,96 @@ interplot(hincfel.2, var1 = "civix.d", var2 = "anti1") +
   geom_hline(yintercept = 0, linetype = 3)
 
 ggsave("hincfel2.jpeg")
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.1 = hincfel.1 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.1 = hincfel.1 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.1 = hincfel.1 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.1 = hincfel.1 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.1 = rbind(pred.hh.1, pred.hl.1, pred.lh.1, pred.ll.1)
+pred.1 = pred.1 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.1 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.1) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(1.5,2.5)+ 
+  xlab("Predicted Value of Subjective Financial Status") +
+  ylab("")
+  
+ggsave("pred.hincfel.1.jpeg")  
+
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.2 = hincfel.2 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.2 = hincfel.2 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.2 = hincfel.2 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.2 = hincfel.2 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.2 = rbind(pred.hh.2, pred.hl.2, pred.lh.2, pred.ll.2)
+pred.2 = pred.2 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.2 = pred.2 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.2) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(0,0.5)+ 
+  xlab("Predicted Value of Subjective Financial Status (gap w/natives") +
+  ylab("")
+  
+ggsave("pred.hincfel.2.jpeg")  
+
 ```
 
 ## Income level
