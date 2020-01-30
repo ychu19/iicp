@@ -176,6 +176,29 @@ ess_lh = ess_tenyr %>% filter(civix.d == 0 & anti1 > 2.230)
 ess_ll = ess_tenyr %>% filter(civix.d == 0 & anti1 <= 2.230)
 ```
 
+```{r descriptive, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.width=8}
+dat.plot = ess_tenyr %>% 
+  dplyr::select(cntry, anti1, civix, civix.d, anti.b) %>% 
+  distinct(cntry, .keep_all = TRUE) %>%
+  na.omit(dat.plot$civix)
+dat.plot = dat.plot %>% mutate(type = ifelse(civix.d == 1 & anti1 > 2.23, "High CIVIX, High Anti-immi.",
+                                             ifelse(civix.d == 1 & anti1 <=2.23, "High CIVIX, Low Anti-immi.",
+                                                    ifelse(civix.d == 0 & anti1 > 2.23, "Low CIVIX, High Anti-immi.", 
+                                                           ifelse(civix.d == 0 & anti1 <= 2.23, "Low CIVIX, Low Anti-immi.", NA)))))
+
+ggplot(data = dat.plot, aes(x = civix, y = anti1, label = cntry)) + 
+  geom_point(aes(shape = type)) + 
+  geom_hline(yintercept = 2.23, linetype = 3) + 
+  geom_vline(xintercept = 2.5, linetype = 3) +
+  geom_text(nudge_x = 0.5) + 
+  ylab("Anti-immigrant sentiments")
+
+ggsave("2by2.jpeg")
+  
+
+```
+
+
 ```{r, echo=FALSE}
 dat.hh = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),
                                         ethnic = mean(ethnic, na.rm = T),
@@ -363,7 +386,8 @@ ggplot(data = pred.2) +
   geom_point(aes(y = group, x = .fitted)) +
   xlim(-0.25,0.25) + 
   xlab("Predicted Value of Political Interests (gap w/natives)") +
-  ylab("")
+  ylab("")+
+  geom_vline(xintercept = 0, linetype = 3)
   
 ggsave("pred.polintr.2.jpeg")  
 ```
@@ -492,7 +516,8 @@ ggplot(data = pred.2) +
   geom_point(aes(y = group, x = .fitted)) +
   xlim(-0.5,0.5)+ 
   xlab("Predicted Value of Politics as Complicated (gap w/natives") +
-  ylab("")
+  ylab("")+
+  geom_vline(xintercept = 0, linetype = 3)
   
 ggsave("pred.polcmpl.2.jpeg")  
 
@@ -619,7 +644,8 @@ ggplot(data = pred.2) +
   geom_point(aes(y = group, x = .fitted)) +
   xlim(-0.5,0.5)+ 
   xlab("Predicted Value of Difficulty in Poli. Decisions") +
-  ylab("")
+  ylab("")+
+  geom_vline(xintercept = 0, linetype = 3)
   
 ggsave("pred.poldcs.2.jpeg")  
 
@@ -745,13 +771,306 @@ ggplot(data = pred.2) +
   geom_point(aes(y = group, x = .fitted)) +
   xlim(-0.25,0.25)+ 
   xlab("Predicted Probability of Employment (gap w/natives)") +
-  ylab("")
+  ylab("")+
+  geom_vline(xintercept = 0, linetype = 3)
   
 ggsave("pred.employ.2.jpeg")  
 
 ```
 
-## Subjective financial status
+## People being fair
+
+```{r}
+summary(ess_tenyr$pplfair)
+summary(ess_tenyr$pplfair.gap)
+```
+
+```{r pplfair, echo=FALSE}
+pplfair.1 = lm(pplfair ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, data = ess_tenyr) # absolute level
+summary(pplfair.1)
+pplfair.2 = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
+summary(pplfair.2)
+```
+
+```{r pplfair.1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(pplfair.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-2.5,2.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("pplfair1.jpeg")
+```
+
+```{r pplfair.2, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(pplfair.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1,1) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("pplfair2.jpeg")
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.1 = pplfair.1 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.1 = pplfair.1 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.1 = pplfair.1 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.1 = pplfair.1 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.1 = rbind(pred.hh.1, pred.hl.1, pred.lh.1, pred.ll.1)
+pred.1 = pred.1 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.1 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.1) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(5,7)+ 
+  xlab("Predicted Value of Considering People Being Fair") + # 0 as most people take advantage, 10 as most people are fair
+  ylab("") 
+  
+ggsave("pred.pplfair.1.jpeg")  
+
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.2 = pplfair.2 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.2 = pplfair.2 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.2 = pplfair.2 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.2 = pplfair.2 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.2 = rbind(pred.hh.2, pred.hl.2, pred.lh.2, pred.ll.2)
+pred.2 = pred.2 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.2 = pred.2 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.2) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(-1,1)+ 
+  xlab("Predicted Value of Considering People Being Fair (gap w/natives)") +
+  ylab("") +
+  geom_vline(xintercept = 0, linetype = 3)
+  
+ggsave("pred.pplfair.2.jpeg")  
+
+```
+
+
+## General Trust
+
+```{r}
+summary(ess_tenyr$ppltrst) # 0 as can't be too careful, 10 as most people can be trusted
+summary(ess_tenyr$ppltrst.gap)
+```
+
+```{r ppltrst, echo=FALSE}
+ppltrst.1 = lm(ppltrst ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, data = ess_tenyr) # absolute level
+summary(ppltrst.1)
+ppltrst.2 = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
+summary(ppltrst.2)
+```
+
+```{r ppltrst.1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(ppltrst.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("ppltrst1.jpeg")
+```
+
+```{r ppltrst.2, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(ppltrst.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1,1) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("ppltrst2.jpeg")
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.1 = ppltrst.1 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.1 = ppltrst.1 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.1 = ppltrst.1 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.1 = ppltrst.1 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.1 = rbind(pred.hh.1, pred.hl.1, pred.lh.1, pred.ll.1)
+pred.1 = pred.1 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.1 = pred.1 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.1) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(4.5,6)+ 
+  xlab("Predicted Value of General Trust") +
+  ylab("")
+  
+ggsave("pred.ppltrst.1.jpeg")  
+
+```
+
+```{r, echo=FALSE, fig.height=3, fig.width=6}
+pred.hh.2 = ppltrst.2 %>%
+  broom::augment(newdata = dat.hh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.hl.2 = ppltrst.2 %>%
+  broom::augment(newdata = dat.hl, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "hl") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.lh.2 = ppltrst.2 %>%
+  broom::augment(newdata = dat.lh, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "lh") %>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.ll.2 = ppltrst.2 %>%
+  broom::augment(newdata = dat.ll, predict = "response") %>%
+  mutate(upper = .fitted + 1.96 * .se.fit,
+         lower = .fitted - 1.96 * .se.fit,
+         group = "ll")%>% 
+  dplyr::select(.fitted, upper, lower, group)
+
+pred.2 = rbind(pred.hh.2, pred.hl.2, pred.lh.2, pred.ll.2)
+pred.2 = pred.2 %>% mutate(group = c('High CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, High Anti-immi.','Low CIVIX, Low Anti-immi.'))
+pred.2 = pred.2 %>% mutate(group = factor(group, levels = c('High CIVIX, High Anti-immi.','Low CIVIX, High Anti-immi.', 'High CIVIX, Low Anti-immi.','Low CIVIX, Low Anti-immi.')))
+
+
+ggplot(data = pred.2) +
+  geom_errorbarh(aes(y = group, xmax = upper, xmin = lower)) + 
+  geom_point(aes(y = group, x = .fitted)) +
+  xlim(-1,1)+ 
+  xlab("Predicted Value of General Trust (gap w/natives)") +
+  ylab("") +
+  geom_vline(xintercept = 0, linetype = 3)
+  
+ggsave("pred.ppltrst.2.jpeg")  
+
+```
+
+
+## Income level
+
+```{r}
+summary(ess_tenyr$hinctnt)
+summary(ess_tenyr$hinctnt.gap)
+```
+
+```{r hinctnt, echo=FALSE}
+hinctnt.1 = lm(hinctnt ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, data = ess_tenyr) # absolute level
+summary(hinctnt.1)
+hinctnt.2 = lm(hinctnt.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
+summary(hinctnt.2)
+```
+
+```{r hinctnt.1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(hinctnt.1, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("hinctnt1.jpeg")
+```
+
+```{r hinctnt.2, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
+
+interplot(hinctnt.2, var1 = "civix.d", var2 = "anti1") + 
+  xlab("Anti-immigrant Sentiments") + 
+  ylab("Effect of CIVIX on Incorporation") + 
+  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
+  geom_hline(yintercept = 0, linetype = 3)
+
+ggsave("hinctnt2.jpeg")
+```
+
+## Subjective Financial Status
 
 ```{r}
 summary(ess_tenyr$hincfel)
@@ -875,40 +1194,4 @@ ggplot(data = pred.2) +
   
 ggsave("pred.hincfel.2.jpeg")  
 
-```
-
-## Income level
-
-```{r}
-summary(ess_tenyr$hinctnt)
-summary(ess_tenyr$hinctnt.gap)
-```
-
-```{r hinctnt, echo=FALSE}
-hinctnt.1 = lm(hinctnt ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1, data = ess_tenyr) # absolute level
-summary(hinctnt.1)
-hinctnt.2 = lm(hinctnt.gap ~ agea + ethnic + female + edu + eubirth + citizen + civix.d*anti1 , data = ess_tenyr) # gap w/natives
-summary(hinctnt.2)
-```
-
-```{r hinctnt.1, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
-
-interplot(hinctnt.1, var1 = "civix.d", var2 = "anti1") + 
-  xlab("Anti-immigrant Sentiments") + 
-  ylab("Effect of CIVIX on Incorporation") + 
-  xlim(1.8, 2.6) +
-  geom_hline(yintercept = 0, linetype = 3)
-
-ggsave("hinctnt1.jpeg")
-```
-
-```{r hinctnt.2, message=FALSE, warning=FALSE, results='asis', echo=FALSE, fig.height=3.5}
-
-interplot(hinctnt.2, var1 = "civix.d", var2 = "anti1") + 
-  xlab("Anti-immigrant Sentiments") + 
-  ylab("Effect of CIVIX on Incorporation") + 
-  ylim(-1.5,1.5) + xlim(1.8, 2.6) +
-  geom_hline(yintercept = 0, linetype = 3)
-
-ggsave("hinctnt2.jpeg")
 ```
