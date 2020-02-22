@@ -1,0 +1,263 @@
+---
+title: "ESS anti-imm sentiment"
+author: "Hyo-Won Shin"
+date: "January 24, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plm) # fixed effect
+library(stargazer)
+library(readxl)
+```
+
+```{r ess, echo=FALSE, message=FALSE, warning=FALSE}
+library(haven)
+ess_2002 = read_dta("~/Political Science 201920/Replication/ESS/ESS1e06_6.stata/ESS1e06_6.dta")
+ess_2004 = read_dta("~/Political Science 201920/Replication/ESS/ESS2e03_6.stata/ESS2e03_6.dta")
+ess_2006 = read_dta("~/Political Science 201920/Replication/ESS/ESS3e03_7.stata/ESS3e03_7.dta")
+ess_2008 = read_dta("~/Political Science 201920/Replication/ESS/ESS4e04_5.stata/ESS4e04_5.dta")
+ess_2010 = read_dta("~/Political Science 201920/Replication/ESS/ESS5e03_4.stata/ESS5e03_4.dta")
+```
+
+```{r ess_yr, echo=FALSE, message=FALSE, warning=FALSE}
+ess_2002 = ess_2002 %>% 
+  select(essround, cntry, agea, blgetmg, ctzcntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2004 = ess_2004 %>% 
+  select(essround, cntry, agea, blgetmg, ctzcntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair,imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2006 = ess_2006 %>% 
+  select(essround, cntry, agea, blgetmg, ctzcntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2008 = ess_2008 %>% 
+  select(essround, cntry, agea, blgetmg, ctzcntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+ess_2010 = ess_2010 %>% 
+  select(essround, cntry, agea, blgetmg, ctzcntr, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvlb"="edu", "imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+
+```
+
+```{r ess_civix, echo=FALSE, message=FALSE, warning=FALSE}
+ess_raw = rbind(ess_2002, ess_2004, ess_2006, ess_2008, ess_2010)
+ess_raw$sec.immi = ifelse(ess_raw$facntr == 2 | ess_raw$mocntr == 2, 1, 0)
+ess_raw$ethnic = ifelse(ess_raw$ethnic == 1, 1,
+                        ifelse(ess_raw$ethnic == 2, 0, NA))
+ess_raw$citizen = ifelse(ess_raw$ctzcntr == 1, 1,
+                         ifelse(ess_raw$ctzcntr == 2, 0, NA))
+ess_raw$birthplace = ifelse(ess_raw$birthplace %in% c(66,77,88,99,"02","03","04","06"), NA, ess_raw$birthplace)
+  ess_raw = ess_raw[complete.cases(ess_raw$birthplace),]
+  eu_member = c("BE", "FR", "DE", "IT", "LU", "NL", "DK", "IE", "GB", "GR", "PT", "ES","AT","SE")
+ess_raw$eubirth = ifelse(ess_raw$birthplace %in% eu_member, 1, 0)
+ess_raw$female = ifelse(ess_raw$gndr == 2, 1, 
+                        ifelse(ess_raw$gndr == 1, 0, NA))
+ess_raw$edu = ifelse(ess_raw$edu > 5, NA, ess_raw$edu)
+
+ess_raw$polintr = ifelse(ess_raw$polintr > 4, NA, ess_raw$polintr)
+ess_raw$hincfel = ifelse(ess_raw$hincfel > 4, NA, ess_raw$hincfel)
+ess_raw$ppltrst = ifelse(ess_raw$ppltrst > 10, NA, ess_raw$ppltrst)
+ess_raw$pplfair = ifelse(ess_raw$pplfair > 10, NA, ess_raw$pplfair)
+ess_raw$employ = ifelse(ess_raw$uempla == 0, 1, 0) # 1 = employed, 0 = unemployed
+
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(sameimavg = mean(sameim, na.rm = T))
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(diffimavg = mean(diffim, na.rm = T))
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(poorimavg = mean(poorim, na.rm = T))
+ess_raw$anti1 = (ess_raw$sameimavg + ess_raw$diffimavg + ess_raw$poorimavg)/3
+
+ess_raw$ecoim <- as.numeric(ess_raw$ecoim)
+library(car)
+ess_raw$ecoim = recode(ess_raw$ecoim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(ecoimavg = mean(ecoim, na.rm = T))
+
+ess_raw$cultim <- as.numeric(ess_raw$cultim)
+library(car)
+ess_raw$cultim = recode(ess_raw$cultim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(cultimavg = mean(cultim, na.rm = T))
+
+ess_raw$liveim <- as.numeric(ess_raw$liveim)
+library(car)
+ess_raw$liveim = recode(ess_raw$liveim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(liveimavg = mean(liveim, na.rm = T))
+ess_raw$anti2 = (ess_raw$ecoimavg + ess_raw$cultimavg + ess_raw$liveimavg)/3
+
+ess_mean = ess_raw %>% filter(citizen == 1) %>% group_by(cntry) %>%
+  select(cntry,polintr, hincfel, employ, ppltrst, pplfair) %>%
+  summarise(mean.poli = mean(polintr, na.rm = TRUE),
+            mean.employ = mean(employ, na.rm = TRUE),
+            mean.hincfel = mean(hincfel, na.rm = TRUE),
+            mean.ppltrst = mean(ppltrst, na.rm = TRUE),
+            mean.pplfair = mean(pplfair, na.rm = TRUE))
+
+ess_immi = ess_raw %>% filter(citizen == 0)
+ess_raw = ess_immi %>% left_join(ess_mean, by='cntry')
+
+ess_immi = ess_raw %>% filter(citizen == 0)
+ess_sec.immi = ess_raw %>% filter(sec.immi == 1)
+
+ess_h.immi = ess_immi %>% filter(cntry %in% c("DK", "NL", "DE", "AT", "FR", "GB", "GR"))
+ess_l.immi = ess_immi %>% filter(cntry %in% c("IE", "SE", "BE", "PT", "ES", "FI","LU", "IT"))
+
+ess_h.CC = ess_immi %>% filter(cntry %in% c("AT", "DK", "FR", "DE", "GR", "IT", "NL"))
+ess_l.CC = ess_immi %>% filter(cntry %in% c("LU", "BE", "PT", "FI", "ES", "IE", "SE", "GB"))
+
+ess_h.EC = ess_immi %>% filter(cntry %in% c("BE", "DK", "FI", "IE", "PT", "SE", "GB"))
+ess_l.EC = ess_immi %>% filter(cntry %in% c("AT", "FR", "DE", "GR", "IT", "LU", "NL", "ES"))
+
+ess_h.XC = ess_immi %>% filter(cntry %in% c("BE", "DK", "FI", "DE", "GR", "NL", "GB"))
+ess_l.XC = ess_immi %>% filter(cntry %in% c("AT", "IT", "LU", "PT", "ES", "SE", "FR", "IE"))
+
+ess_h.sec.immi = ess_sec.immi %>% filter(cntry %in% c("DK", "NL", "DE", "AT", "FR", "GB", "GR"))
+ess_l.sec.immi = ess_sec.immi %>% filter(cntry %in% c("IE", "SE", "BE", "PT", "ES", "FI","LU", "IT"))
+
+ess_EU15 = ess_immi %>% filter(cntry %in% c("AT", "DK", "FR", "DE", "GR", "IT", "NL", "LU", "BE", "PT", "FI", "ES", "IE", "SE", "GB"))
+
+CIVIXscores <- read_excel("~/Political Science 201920/Replication/CIVIXscores.xlsx")
+
+ess_EU15 <- merge(ess_EU15, CIVIXscores, by="cntry")
+ess_EU15$dummy <- ifelse(ess_EU15$civix > 2.5, 1, 0)
+ess_EU15$dummy4 <- ifelse(ess_EU15$civix > 4.25, 1, 0)
+ess_EU15$lmh <- ifelse(ess_EU15$civix < 3, 0,
+                       ifelse(ess_EU15$civix > 6, 2, 1))
+
+
+```
+
+```{r ess_gap, echo=FALSE, message=FALSE, warning=FALSE}
+
+ess_h.immi = ess_h.immi %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_l.immi = ess_l.immi %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_h.CC = ess_h.CC %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_l.CC = ess_l.CC %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_h.EC = ess_h.EC %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_l.EC = ess_l.EC %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_h.XC = ess_h.XC %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_l.XC = ess_l.XC %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_h.sec.immi = ess_h.sec.immi %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_l.sec.immi = ess_l.sec.immi %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+ess_EU15 = ess_EU15 %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair
+  )
+
+```
+
+```{r} 
+# Political interest
+polintr.EUdumsc = lm(polintr ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy * anti1, data = ess_EU15) # absolute level
+polintr.EUdum2sc = lm(poli.gap ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy * anti1, data = ess_EU15) # gap
+summary(polintr.EUdumsc)
+summary(polintr.EUdum2sc)
+
+# Financial status
+hincfel.EUdumsc = lm(hincfel ~ agea + ethnic + female + edu + eubirth + dummy +anti1 + dummy*anti1, data = ess_EU15) # absolute level
+hincfel.EUdum2sc = lm(hincfel.gap ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy*anti1, data = ess_EU15) # gap
+summary(hincfel.EUdumsc)
+summary(hincfel.EUdum2sc)
+
+# Employment status
+employ.EUdumsc = glm(employ ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy*anti1, data = ess_EU15, family = binomial(link = "logit")) # absolute level
+employ.EUdum2sc = lm(employ.gap ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy*anti1, data = ess_EU15) # gap
+summary(employ.EUdumsc)
+summary(employ.EUdum2sc)
+
+# General trust 
+ppltrst.EUdumsc = lm(ppltrst ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy*anti1, data = ess_EU15) # absolute level
+ppltrst.EUdum2sc = lm(ppltrst.gap ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy*anti1, data = ess_EU15) # gap
+summary(ppltrst.EUdumsc)
+summary(ppltrst.EUdum2sc)
+
+# General trust (ppl fair)
+pplfair.EUdumsc = lm(pplfair ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy*anti1, data = ess_EU15) # absolute level
+pplfair.EUdum2sc = lm(pplfair.gap ~ agea + ethnic + female + edu + eubirth + dummy + anti1 + dummy*anti1, data = ess_EU15) # gap
+summary(pplfair.EUdumsc)
+summary(pplfair.EUdum2sc)
+
+```

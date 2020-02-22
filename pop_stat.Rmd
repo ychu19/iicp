@@ -1,0 +1,17 @@
+---
+title: "population_stat"
+author: "Yuan-Ning Chu"
+date: "2/19/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+```
+
+```{r}
+
+```
+
