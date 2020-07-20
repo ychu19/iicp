@@ -1,0 +1,756 @@
+---
+title: "Descriptive Statistics: Replication Paper"
+subtitle: "ESS 2002 - 2010 (Five Waves)"
+author: "IICP Research Team"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plm) # fixed effect
+library(ggplot2)
+library(interplot)
+```
+
+```{r ess, echo=FALSE, message=FALSE, warning=FALSE}
+ess_2002 = haven::read_stata("ESS1e06_6.dta")
+ess_2004 = haven::read_stata("ESS2e03_6.dta")
+ess_2006 = haven::read_stata("ESS3e03_7.dta")
+ess_2008 = haven::read_stata("ESS4e04_5.dta")
+ess_2010 = haven::read_stata("ESS5e03_4.dta")
+```
+
+```{r ess_yr, echo=FALSE, message=FALSE, warning=FALSE}
+ess_2002 = ess_2002 %>% 
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrth, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
+  plyr::rename(c("cntbrth"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+  ess_2002 = ess_2002 %>% mutate(hinctnt = hinctnt/12*10) # rescale to fit data from 2008 and 2010
+ess_2004 = ess_2004 %>% 
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair,imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+  ess_2004 = ess_2004 %>% mutate(hinctnt = hinctnt/12*10)
+ess_2006 = ess_2006 %>% 
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrtha, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnt) %>%
+  plyr::rename(c("cntbrtha"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim"))
+  ess_2006 = ess_2006 %>% mutate(hinctnt = hinctnt/12*10)
+ess_2008 = ess_2008 %>% 
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecntr, cntbrthb, gndr, edulvla, facntr, mocntr, polintr, polcmpl, poldcs, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnta) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "edulvla"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim", "hinctnta" = "hinctnt"))
+ess_2010 = ess_2010 %>% 
+  dplyr::select(essround, cntry, agea, blgetmg, brncntr, ctzcntr, livecnta, cntbrthb, gndr, edulvlb, facntr, mocntr, polintr, hincfel, uempla, ppltrst, pplfair, imsmetn, imdfetn, impcntr, imbgeco, imueclt, imwbcnt, hinctnta) %>%
+  plyr::rename(c("cntbrthb"="birthplace","blgetmg"="ethnic", "livecnta" = "livecntr","edulvlb"="edu", "brncntr"="fborn","imsmetn"="sameim", "imdfetn"="diffim", "impcntr"="poorim", "imbgeco"="ecoim", "imueclt"="cultim", "imwbcnt"="liveim", "hinctnta" = "hinctnt"))
+  ess_2010$livecntr = ess_2010$livecntr - 2010
+  ess_2010$livecntr = ifelse(ess_2010$livecntr >= 1, 1,
+                           ifelse(ess_2010$livecntr %in% c(-1:-5), 2,
+                                  ifelse(ess_2010$livecntr %in% c(-6:-10), 3,
+                                         ifelse(ess_2010$livecntr %in% c(-11:-20), 4,
+                                                ifelse(ess_2010$livecntr < -20, 5, NA)))))
+  ess_2010$polcmpl = NA
+  ess_2010$poldcs = NA
+
+ess_2002 = haven::zap_labels(ess_2002)
+ess_2010 = haven::zap_labels(ess_2010)
+```
+
+```{r ess_civix, echo=FALSE, message=FALSE, warning=FALSE}
+ess_raw = rbind(ess_2002, ess_2004, ess_2006, ess_2008, ess_2010)
+ess_raw$sec.immi = ifelse(ess_raw$facntr == 2 | ess_raw$mocntr == 2, 1, 0)
+ess_raw$ethnic = ifelse(ess_raw$ethnic == 1, 1,
+                        ifelse(ess_raw$ethnic == 2, 0, NA))
+ess_raw$citizen = ifelse(ess_raw$ctzcntr == 1, 1,
+                         ifelse(ess_raw$ctzcntr == 2, 0, NA))
+ess_raw$residence = ifelse(ess_raw$livecntr <= 3, 1, 0) # 1 = lived less than 10 yrs, 0 = lived more than 10 yrs
+ess_raw$fborn = ifelse(ess_raw$fborn == 1, 0, 1) # now 1 as foreign born, 0 as native born
+ess_raw$birthplace = ifelse(ess_raw$birthplace %in% c(66,77,88,99,"02","03","04","06"), NA, ess_raw$birthplace)
+  ess_raw = ess_raw[complete.cases(ess_raw$birthplace),]
+  eu_member = c("BE", "FR", "DE", "IT", "LU", "NL", "DK", "IE", "GB", "GR", "PT", "ES","AT","SE")
+ess_raw$eubirth = ifelse(ess_raw$birthplace %in% eu_member, 1, 0)
+ess_raw$female = ifelse(ess_raw$gndr == 2, 1, 
+                        ifelse(ess_raw$gndr == 1, 0, NA))
+ess_raw$edu = ifelse(ess_raw$edu > 5, NA, ess_raw$edu)
+
+ess_raw$polintr = ifelse(ess_raw$polintr > 4, NA, ess_raw$polintr)
+# table(ess_raw$polcmpl) whether politics are too complicated to understand, 5 as always, 1 as never
+# table(ess_raw$poldcs) how difficult it is to make mind up about political issues, 5 as very easy, 1 as very difficult
+ess_raw$poldcs = ifelse(ess_raw$poldcs == 5, 1, # now 1 as easy
+                        ifelse(ess_raw$poldcs == 4, 2, 
+                               ifelse(ess_raw$poldcs == 3, 3, 
+                                      ifelse(ess_raw$poldcs == 2, 4, 
+                                             ifelse(ess_raw$poldcs == 1, 5, ess_raw$poldcs))))) # 5 as difficult
+ess_raw$hincfel = ifelse(ess_raw$hincfel > 4, NA, ess_raw$hincfel)
+ess_raw$ppltrst = ifelse(ess_raw$ppltrst > 10, NA, ess_raw$ppltrst) # 0 as can't be too careful, 10 as most people can be trusted
+ess_raw$pplfair = ifelse(ess_raw$pplfair > 10, NA, ess_raw$pplfair) # 0 as most people take advantage, 10 as most people are fair
+ess_raw$employ = ifelse(ess_raw$uempla == 0, 1, 0) # 1 = employed, 0 = unemployed
+```
+
+```{r anti-immigrant, echo=FALSE, message=FALSE, warning=FALSE, echo=FALSE}
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(sameimavg = mean(sameim, na.rm = T))
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(diffimavg = mean(diffim, na.rm = T))
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(poorimavg = mean(poorim, na.rm = T))
+ess_raw$anti1 = (ess_raw$sameimavg + ess_raw$diffimavg + ess_raw$poorimavg)/3 
+ess_raw$anti3 = (ess_raw$sameimavg + ess_raw$diffimavg + ess_raw$poorimavg)/3 / 4 * 10 # rescale
+
+ess_raw = ess_raw %>% mutate(
+  anti.b = ifelse(anti1 > 2.230, 1, 0)
+)
+
+ess_raw$ecoim <- as.numeric(ess_raw$ecoim)
+library(car)
+# ess_raw$ecoim = recode(ess_raw$ecoim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(ecoimavg = mean(ecoim, na.rm = T))
+
+ess_raw$cultim <- as.numeric(ess_raw$cultim)
+# library(car)
+# ess_raw$cultim = recode(ess_raw$cultim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(cultimavg = mean(cultim, na.rm = T))
+
+ess_raw$liveim <- as.numeric(ess_raw$liveim)
+# library(car)
+# ess_raw$liveim = recode(ess_raw$liveim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+ess_raw <- ess_raw %>%
+  group_by(cntry) %>%
+  mutate(liveimavg = mean(liveim, na.rm = T))
+ess_raw$anti2 = (ess_raw$ecoimavg + ess_raw$cultimavg + ess_raw$liveimavg)/3
+```
+
+```{r civix, message=FALSE, warning=FALSE, echo=FALSE}
+# civix.cntry = c("AT", "BE", "DK", "FI", "FR", "DE", "GR", "IE", "NL", "PT", "ES", "SE", "GB")
+#   civix.sc =   as.numeric( c(5.5, 1.25, 8.25,  2.5,    5,     7, 5.25,    1, 6.25, 1.25, 2.5, 0, 5.5))
+#   civix.1 = as.data.frame(t(rbind(civix.cntry, civix.sc)))
+#   colnames(civix.1) = c("cntry", "civix")
+#   civix.1$civix = as.numeric(civix.1$civix)
+library(readxl)
+civix.1 = read_xlsx("CIVIXscores.xlsx")
+# table(civix.1$cntry)
+
+ess_raw = ess_raw %>% left_join(civix.1, by = 'cntry') 
+ess_raw = ess_raw %>% mutate(civix.d = ifelse(civix > 2.5, 1, 0))
+```
+
+```{r mean, message=FALSE, warning=FALSE, echo=FALSE}
+ess_mean = ess_raw %>% filter(citizen == 1) %>% group_by(cntry) %>% 
+  dplyr::select(cntry,polintr, hincfel, employ, ppltrst, pplfair, polcmpl, poldcs, hinctnt) %>%
+  summarise(mean.poli = mean(polintr, na.rm = TRUE),
+            mean.employ = mean(employ, na.rm = TRUE),
+            mean.hincfel = mean(hincfel, na.rm = TRUE),
+            mean.ppltrst = mean(ppltrst, na.rm = TRUE),
+            mean.pplfair = mean(pplfair, na.rm = TRUE),
+            mean.polcmpl = mean(polcmpl, na.rm = TRUE),
+            mean.poldcs = mean(poldcs, na.rm = TRUE),
+            mean.hinctnt = mean(hinctnt, na.rm = TRUE))
+
+ess_tenyr = ess_raw %>% filter(residence == 1)
+
+ess_tenyr = ess_tenyr %>% left_join(ess_mean, by='cntry')
+ess_raw = ess_raw %>% left_join(ess_mean, by='cntry')
+
+ess_tenyr = ess_tenyr %>% mutate(
+  poli.gap = polintr - mean.poli, 
+  employ.gap = employ - mean.employ,
+  hincfel.gap = hincfel - mean.hincfel, 
+  ppltrst.gap = ppltrst - mean.ppltrst,
+  pplfair.gap = pplfair - mean.pplfair, 
+  polcmpl.gap = polcmpl - mean.polcmpl,
+  poldcs.gap = poldcs - mean.poldcs,
+  hinctnt.gap = hinctnt - mean.hinctnt
+  )
+
+ess_h.tenyr = ess_tenyr %>% filter(civix.d == 1)
+ess_l.tenyr = ess_tenyr %>% filter(civix.d == 0)
+
+ess_anti.h = ess_tenyr %>% filter(anti1 > 2.230)
+ess_anti.l = ess_tenyr %>% filter(anti1 <= 2.230)
+
+ess_hh = ess_tenyr %>% filter(civix.d == 1 & anti1 > 2.230)
+ess_hl = ess_tenyr %>% filter(civix.d == 1 & anti1 <= 2.230)
+ess_lh = ess_tenyr %>% filter(civix.d == 0 & anti1 > 2.230)
+ess_ll = ess_tenyr %>% filter(civix.d == 0 & anti1 <= 2.230)
+```
+
+# Notes
+
+* There is a variation in sample sizes across countries. It's likely that a lot of the results are driven by a few countries 
+  + Very large sample size in Spain (ES) and Ireland (IE), both countries have lower CIVIX scores
+  + Very small sample size in Italy (IT) and Finland (FI); Italy with a high CIVIX score and Finland with a low one
+  + Question about residency and citizenship was not widely asked in Italy from 2006 to 2010 (latest three waves)
+* All the distributions of the outcome variables are for immigrants (those who have lived in the countrt for less than 10 years)
+* We also included all the regression models FYI
+
+# Descriptive Statistics
+
+## Sample Size 
+
+### 10 years of residence
+
+```{r sample size, echo=FALSE, warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ess_raw %>% filter(civix.d == 1) %>% # mutate(residence = as.factor(residence)) %>% na.omit(residence) %>%
+ggplot(aes(x = residence)) +
+ geom_histogram(binwidth = 0.5, stat = "count") + 
+  stat_bin(binwidth = 0.5, stat = "count", geom = "text", colour = "white", size = 3.5,
+            aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  # scale_x_continuous("Immigrants by residence (less than 10 years)", labels = c("0" = "Natives", "1" = "Immigrants")) +
+  facet_wrap(~cntry, nrow = 2) +
+  xlab("Immigrants by residence (less than 10 years); 0 = Natives, 1 = Immigrants") +
+  ggtitle("Sample Size in Countries with High CIVIX Scores, ESS 2002 - 2010")
+
+# ggsave("high.civix.sample.jpeg")
+
+ess_raw %>% filter(civix.d == 0) %>% # mutate(residence = as.factor(residence)) %>% na.omit(residence) %>%
+ggplot(aes(x = residence)) +
+ geom_histogram(binwidth = 0.5, stat = "count") + 
+  stat_bin(binwidth = 0.5, stat = "count", geom = "text", colour = "white", size = 3.5,
+            aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  # scale_x_continuous("Immigrants by residence (less than 10 years)", labels = c("0" = "Natives", "1" = "Immigrants")) +
+  facet_wrap(~cntry, nrow = 2) +
+  xlab("Immigrants by residence (less than 10 years); 0 = Natives, 1 = Immigrants") +
+  ggtitle("Sample Size in Countries with Low CIVIX Scores, ESS 2002 - 2010")
+
+# ggsave("low.civix.sample.jpeg")
+```
+
+<a href="#top">Back to top</a>
+
+### Sample Size: citizenship
+
+```{r sample size citizenship, echo=FALSE, warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ess_raw %>% filter(civix.d == 1) %>% # mutate(residence = as.factor(residence)) %>% na.omit(residence) %>%
+ggplot(aes(x = citizen)) +
+ geom_histogram(binwidth = 0.5, stat = "count") + 
+  stat_bin(binwidth = 0.5, stat = "count", geom = "text", colour = "white", size = 3.5,
+            aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  # scale_x_continuous("Immigrants by residence (less than 10 years)", labels = c("0" = "Natives", "1" = "Immigrants")) +
+  facet_wrap(~cntry, nrow = 2) +
+  xlab("Immigrants by citizenship; 0 = Non-citizens, 1 = Citizens") +
+  ggtitle("Sample Size in Countries with High CIVIX Scores, ESS 2002 - 2010")
+
+# ggsave("high.civix.sample.jpeg")
+
+ess_raw %>% filter(civix.d == 0) %>% # mutate(residence = as.factor(residence)) %>% na.omit(residence) %>%
+ggplot(aes(x = citizen)) +
+ geom_histogram(binwidth = 0.5, stat = "count") + 
+  stat_bin(binwidth = 0.5, stat = "count", geom = "text", colour = "white", size = 3.5,
+            aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  # scale_x_continuous("Immigrants by residence (less than 10 years)", labels = c("0" = "Natives", "1" = "Immigrants")) +
+  facet_wrap(~cntry, nrow = 2) +
+  xlab("Immigrants by citizenship; 0 = Non-citizens, 1 = Citizens") +
+  ggtitle("Sample Size in Countries with Low CIVIX Scores, ESS 2002 - 2010")
+
+# ggsave("low.civix.sample.jpeg")
+```
+
+<a href="#top">Back to top</a>
+
+## Outcome Variable: Political Interest
+
+* 1 as very interested, 4 as not at all
+
+### Absolute Value (Political Interest)
+
+```{r polintr des, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+  ggplot(data = ess_h.tenyr, aes(x = polintr)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political Interest") +
+  ggtitle("Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = polintr)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political Interest") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+# ggsave("low.civix.polintr.jpeg")
+```
+
+### Gap with Native Citizens (Political Interest)
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ ggplot(data = ess_h.tenyr, aes(x = poli.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political Interest (Gap)") +
+  ggtitle("Distribution across Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = poli.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political Interest (gap)") +
+  ggtitle("Distribution across Countries with Low CIVIX Scores")
+```
+
+<a href="#top">Back to top</a>
+
+```{r polintr mean, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, include=FALSE}
+# ess_tenyr = ess_tenyr[order(ess_tenyr$mean.poli)]
+# ess_raw$mean.poli = with(ess_raw, reorder(mean.poli, cntry))
+
+
+
+# ess_tenyr %>% dplyr::select(mean.poli, polintr, civix.d, cntry, poli.gap) %>% 
+#   group_by(cntry) %>% # order_by(.,mean.poli, call = ) %>%
+#   na.omit(civix.d) %>%  # arrange(polintr) %>% nest(cntry) 
+#   # mutate(mean.poli = factor(round(mean.poli, digits = 2), levels = mean.poli)) %>%
+#   ggplot(aes(x = reorder(cntry, -poli.gap), y = poli.gap,  color = as.factor(civix.d))) + 
+#   # geom_point() + 
+#   geom_pointrange()
+```
+
+## Outcome Variable: Politics are complicated
+
+* 1 as never, 5 as frequently
+
+### Absolute Value (Political Sophistication)
+
+```{r polcmpl des, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+  ggplot(data = ess_h.tenyr, aes(x = polcmpl)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political Sophistication") +
+  ggtitle("Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = polcmpl)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political Sophistication") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+# ggsave("low.civix.polintr.jpeg")
+```
+
+### Gap with Native Citizens (Political Sophistication)
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ ggplot(data = ess_h.tenyr, aes(x = polcmpl.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political Sophistication (Gap)") +
+  ggtitle("Distribution across Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = polcmpl.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political Sophistication (gap)") +
+  ggtitle("Distribution across Countries with Low CIVIX Scores")
+```
+
+<a href="#top">Back to top</a>
+
+## Outcome Variable: Difficult to make political decisions
+
+* 1 as very difficult, 5 as very easy
+
+### Absolute Value (Political decisions)
+
+```{r poldcs des, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+  ggplot(data = ess_h.tenyr, aes(x = poldcs)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political decisions") +
+  ggtitle("Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = poldcs)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political decisions") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+# ggsave("low.civix.polintr.jpeg")
+```
+
+### Gap with Native Citizens (Political decisions)
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ ggplot(data = ess_h.tenyr, aes(x = poldcs.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political decisions (Gap)") +
+  ggtitle("Distribution across Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = poldcs.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political decisions (gap)") +
+  ggtitle("Distribution across Countries with Low CIVIX Scores")
+```
+
+<a href="#top">Back to top</a>
+
+## Outcome Variable: Subjective Financial Situations
+
+### Absolute Value 
+
+```{r hincfel des, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+  ggplot(data = ess_h.tenyr, aes(x = hincfel)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Subjective Financial Situations") +
+  ggtitle("Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = hincfel)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Subjective Financial Situations") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+# ggsave("low.civix.polintr.jpeg")
+```
+
+### Gap with Native Citizens (Subjective Financial Situations)
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ ggplot(data = ess_h.tenyr, aes(x = hincfel.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Subjective Financial Situations (Gap)") +
+  ggtitle("Distribution across Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = hincfel.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Subjective Financial Situations (gap)") +
+  ggtitle("Distribution across Countries with Low CIVIX Scores")
+```
+
+<a href="#top">Back to top</a>
+
+## Outcome Variable: Employment
+
+* 1 as employed, 0 as unemployed 
+
+### Absolute Value (employment)
+
+```{r employ des, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+  ggplot(data = ess_h.tenyr, aes(x = employ)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Employment") +
+  ggtitle("Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = employ)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Employment") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+# ggsave("low.civix.polintr.jpeg")
+```
+
+### Gap with Native Citizens (employment)
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ ggplot(data = ess_h.tenyr, aes(x = employ.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Employment (Gap)") +
+  ggtitle("Distribution across Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = employ.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Employment (gap)") +
+  ggtitle("Distribution across Countries with Low CIVIX Scores")
+```
+
+<a href="#top">Back to top</a>
+
+## Outcome Variable: General Trust
+
+* "Most people can be trusted or you can't be too careful"
+  + 0 as can't be too careful, 10 as most people can be trusted
+
+### Absolute Value (Trust)
+
+```{r trust des, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+  ggplot(data = ess_h.tenyr, aes(x = ppltrst)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white",  size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("General Trust") +
+  ggtitle("Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = ppltrst)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white",  size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("General Trust") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+# ggsave("low.civix.polintr.jpeg")
+```
+
+### Gap with Native Citizens (General Trust)
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ ggplot(data = ess_h.tenyr, aes(x = ppltrst.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white",  size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("General Trust (Gap)") +
+  ggtitle("Distribution across Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = ppltrst.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white",  size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("General Trust (gap)") +
+  ggtitle("Distribution across Countries with Low CIVIX Scores")
+```
+
+<a href="#top">Back to top</a>
+
+## Outcome Variable: People being fair
+
+* "Most people try to take advantage of you, or try to be fair"
+  + 0 as most people take advantage, 10 as most people are fair
+
+### Absolute Value (People being fair)
+
+```{r pplfair des, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+  ggplot(data = ess_h.tenyr, aes(x = pplfair)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("People being fair") +
+  ggtitle("Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = pplfair)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("People being fair") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+# ggsave("low.civix.polintr.jpeg")
+```
+
+### Gap with Native Citizens (People being fair)
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8}
+ ggplot(data = ess_h.tenyr, aes(x = pplfair.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white",  size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("People being fair (Gap)") +
+  ggtitle("Distribution across Countries with High CIVIX Scores")
+
+# ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = pplfair.gap)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white",  size = 2,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("People being fair (gap)") +
+  ggtitle("Distribution across Countries with Low CIVIX Scores")
+```
+
+<a href="#top">Back to top</a>
+
+# Regression Models for Different Outcomes
+
+## Political Interest
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, results='asis'}
+polintr.1 = lm(polintr ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.1)
+polintr.2 = lm(poli.gap ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.2)
+
+stargazer::stargazer(header = FALSE, polintr.1, polintr.2,
+                     type = "html", 
+                     covariate.labels = c("CIVIX", "Age", "Ethnic Minority",
+                               "Female", "Born in EU", "Citizen"),
+                     column.labels   = c("Abs", "Gap"))
+```
+
+<a href="#top">Back to top</a>
+
+## Politics are Complicated
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, results='asis'}
+polcmpl.1 = lm(polcmpl ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polcmpl.1)
+polcmpl.2 = lm(polcmpl.gap ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.2)
+
+stargazer::stargazer(header = FALSE, polcmpl.1, polcmpl.2,
+                     type = "html", 
+                     covariate.labels = c("CIVIX", "Age", "Ethnic Minority",
+                               "Female", "Born in EU", "Citizen"),
+                     column.labels   = c("Abs", "Gap"))
+```
+
+<a href="#top">Back to top</a>
+
+## Difficult to make decisions abotu politics
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, results='asis'}
+poldcs.1 = lm(poldcs ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polcmpl.1)
+poldcs.2 = lm(poldcs.gap ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.2)
+
+stargazer::stargazer(header = FALSE, poldcs.1, poldcs.2,
+                     type = "html", 
+                     covariate.labels = c("CIVIX", "Age", "Ethnic Minority",
+                               "Female", "Born in EU", "Citizen"),
+                     column.labels   = c("Abs", "Gap"))
+```
+
+<a href="#top">Back to top</a>
+
+## Subjective Financial Situations
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, results='asis'}
+hincfel.1 = lm(hincfel ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polcmpl.1)
+hincfel.2 = lm(hincfel.gap ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.2)
+
+stargazer::stargazer(header = FALSE, hincfel.1, hincfel.2,
+                     type = "html", 
+                     covariate.labels = c("CIVIX", "Age", "Ethnic Minority",
+                               "Female", "Born in EU", "Citizen"),
+                     column.labels   = c("Abs", "Gap"))
+```
+
+<a href="#top">Back to top</a>
+
+## Employment
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, results='asis'}
+employ.1 = glm(employ ~ civix.d + agea + ethnic + female + edu + eubirth + citizen, family = "binomial" , data = ess_tenyr)
+# summary(polcmpl.1)
+employ.2 = lm(employ.gap ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.2)
+
+stargazer::stargazer(header = FALSE, employ.1, employ.2,
+                     type = "html", 
+                     covariate.labels = c("CIVIX", "Age", "Ethnic Minority",
+                               "Female", "Born in EU", "Citizen"),
+                     column.labels   = c("Abs (Logit)", "Gap"))
+```
+
+<a href="#top">Back to top</a>
+
+## General Trust
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, results='asis'}
+ppltrst.1 = lm(ppltrst ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polcmpl.1)
+ppltrst.2 = lm(ppltrst.gap ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.2)
+
+stargazer::stargazer(header = FALSE, ppltrst.1, ppltrst.2,
+                     type = "html", 
+                     covariate.labels = c("CIVIX", "Age", "Ethnic Minority",
+                               "Female", "Born in EU", "Citizen"),
+                     column.labels   = c("Abs", "Gap"))
+```
+
+<a href="#top">Back to top</a>
+
+## People being fair
+
+```{r, echo=FALSE,warning=FALSE, message=FALSE, fig.height=4, fig.width=8, results='asis'}
+pplfair.1 = lm(pplfair ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polcmpl.1)
+pplfair.2 = lm(pplfair.gap ~ civix.d + agea + ethnic + female + edu + eubirth + citizen , data = ess_tenyr)
+# summary(polintr.2)
+
+stargazer::stargazer(header = FALSE, pplfair.1, pplfair.2,
+                     type = "html", 
+                     covariate.labels = c("CIVIX", "Age", "Ethnic Minority",
+                               "Female", "Born in EU", "Citizen"),
+                     column.labels   = c("Abs", "Gap"))
+```
+
+<a href="#top">Back to top</a>
