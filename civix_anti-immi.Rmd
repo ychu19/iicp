@@ -49,6 +49,8 @@ ess_2010 = ess_2010 %>%
   ess_2010$polcmpl = NA
   ess_2010$poldcs = NA
 
+ess_2002 = haven::zap_labels(ess_2002)
+ess_2010 = haven::zap_labels(ess_2010)
 ```
 
 ```{r ess_civix, echo=FALSE, message=FALSE, warning=FALSE}
@@ -82,6 +84,7 @@ ess_raw$pplfair = ifelse(ess_raw$pplfair > 10, NA, ess_raw$pplfair) # 0 as most 
 ess_raw$employ = ifelse(ess_raw$uempla == 0, 1, 0) # 1 = employed, 0 = unemployed
 ```
 
+
 ```{r anti-immigrant, message=FALSE, warning=FALSE, echo=FALSE}
 ess_raw <- ess_raw %>%
   group_by(cntry) %>%
@@ -101,21 +104,21 @@ ess_raw = ess_raw %>% mutate(
 
 ess_raw$ecoim <- as.numeric(ess_raw$ecoim)
 library(car)
-ess_raw$ecoim = recode(ess_raw$ecoim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+# ess_raw$ecoim = recode(ess_raw$ecoim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
 ess_raw <- ess_raw %>%
   group_by(cntry) %>%
   mutate(ecoimavg = mean(ecoim, na.rm = T))
 
 ess_raw$cultim <- as.numeric(ess_raw$cultim)
 # library(car)
-ess_raw$cultim = recode(ess_raw$cultim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+# ess_raw$cultim = recode(ess_raw$cultim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
 ess_raw <- ess_raw %>%
   group_by(cntry) %>%
   mutate(cultimavg = mean(cultim, na.rm = T))
 
 ess_raw$liveim <- as.numeric(ess_raw$liveim)
 # library(car)
-ess_raw$liveim = recode(ess_raw$liveim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
+# ess_raw$liveim = recode(ess_raw$liveim,'0=10; 1=9; 2=8; 3=7; 4=6; 5=5; 6=4; 7=3; 8=2; 9=1; 10=0')
 ess_raw <- ess_raw %>%
   group_by(cntry) %>%
   mutate(liveimavg = mean(liveim, na.rm = T))
@@ -130,11 +133,11 @@ ess_raw$anti2 = (ess_raw$ecoimavg + ess_raw$cultimavg + ess_raw$liveimavg)/3
 #   civix.1$civix = as.numeric(civix.1$civix)
 library(readxl)
 civix.1 = read_xlsx("CIVIXscores.xlsx")
+table(civix.1$cntry)
 
 ess_raw = ess_raw %>% left_join(civix.1, by = 'cntry') 
 ess_raw = ess_raw %>% mutate(civix.d = ifelse(civix > 2.5, 1, 0))
 ```
-
 
 ```{r mean, message=FALSE, warning=FALSE, echo=FALSE}
 ess_mean = ess_raw %>% filter(citizen == 1) %>% group_by(cntry) %>% 
@@ -176,6 +179,8 @@ ess_lh = ess_tenyr %>% filter(civix.d == 0 & anti1 > 2.230)
 ess_ll = ess_tenyr %>% filter(civix.d == 0 & anti1 <= 2.230)
 ```
 
+# Descriptive 
+
 ```{r descriptive, echo=FALSE, warning=FALSE, message=FALSE, fig.height=5, fig.width=8}
 dat.plot = ess_tenyr %>% 
   dplyr::select(cntry, anti1, civix, civix.d, anti.b) %>% 
@@ -193,11 +198,79 @@ ggplot(data = dat.plot, aes(x = civix, y = anti1, label = cntry)) +
   geom_text(nudge_x = 0.5) + 
   ylab("Anti-immigrant sentiments")
 
-ggsave("2by2.jpeg")
+# ggsave("2by2.jpeg")
   
 
 ```
+```{r sample size}
+ess_raw %>% filter(civix.d == 1) %>% mutate(residence = as.factor(residence)) %>% na.omit(residence) %>%
+ggplot(aes(x = residence)) +
+  geom_bar(binwidth = 0.5, stat = "count") + 
+  stat_count(binwidth = 0.5, stat = "count", geom = "text", colour = "white", size = 3.5,
+            aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  scale_x_discrete("Immigrants by residence (less than 10 years)", labels = c("0" = "Natives", "1" = "Immigrants")) +
+  facet_wrap(~cntry, nrow = 2) +
+  # xlab("Immigrants by residence (less than 10 years)") +
+  ggtitle("Sample Size in Countries with High CIVIX Scores, ESS 2002 - 2010")
 
+ggsave("high.civix.sample.jpeg")
+
+ess_raw %>% filter(civix.d == 0) %>% mutate(residence = as.factor(residence)) %>% na.omit(residence) %>%
+ggplot(aes(x = residence)) +
+  geom_bar(binwidth = 0.5, stat = "count") + 
+  stat_count(binwidth = 0.5, stat = "count", geom = "text", colour = "white", size = 3.5,
+            aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  scale_x_discrete("Immigrants by residence (less than 10 years)", labels = c("0" = "Natives", "1" = "Immigrants")) +
+  facet_wrap(~cntry, nrow = 2) +
+  # xlab("Immigrants by residence (less than 10 years)") +
+  ggtitle("Sample Size in Countries with Low CIVIX Scores, ESS 2002 - 2010")
+
+ggsave("low.civix.sample.jpeg")
+```
+
+
+```{r polintr des}
+  ggplot(data = ess_h.tenyr, aes(x = polintr)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political Interest") +
+  ggtitle("Countries with High CIVIX Scores")
+
+ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = polintr)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political Interest") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+ ggsave("low.civix.polintr.jpeg")
+```
+```{r polintr des}
+  ggplot(data = ess_h.tenyr, aes(x = polintr)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) +
+  facet_wrap(~cntry, nrow = 2) + 
+  xlab("Political Interest") +
+  ggtitle("Countries with High CIVIX Scores")
+
+ggsave("high.civix.polintr.jpeg")
+
+ ggplot(data = ess_l.tenyr, aes(x = polintr)) + 
+  geom_histogram(binwidth = 1)  + 
+  stat_bin(binwidth = 1, geom = "text", colour = "white", size = 3.5,
+           aes(label = ..count..),position=position_stack(vjust=0.5)) + 
+  facet_wrap(~cntry, nrow = 2)+ 
+  xlab("Political Interest") +
+  ggtitle("Countries with Low CIVIX Scores")
+ 
+ ggsave("low.civix.polintr.jpeg")
+```
 
 ```{r, echo=FALSE}
 dat.hh = with(ess_tenyr, data.frame(agea = mean(agea, na.rm = T),

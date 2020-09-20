@@ -1,0 +1,72 @@
+---
+title: "research_note"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(plm) # fixed effect
+library(stargazer)
+```
+
+```{r civix}
+
+civix = readxl::read_xlsx("expanded-civix-eu-15.xlsx")
+civix = civix %>% rename("Original" = "Original \r\n(CP: 2.5)", 
+                         "Con" = "Conditioning \r\n(CP: 8.75)",
+                         "Enab" = "Enabling\r\n(CP: 5)",
+                         "Expan" = "Expanded\r\n(CP: 16)") %>%
+  mutate(Expan = Expan/2) # to re-scale
+
+
+```
+
+```{r civix plot, fig.height=2.5, fig.width=5}
+civix = civix %>% arrange(desc(Original)) %>% 
+  mutate(Country = factor(Country, levels=as.vector(civix$Country))) # %>%
+ggplot(data = civix, mapping = aes(x = Country)) +
+  geom_point(aes(y = Original)) + 
+  # ylim(0, 8.5) + 
+  geom_point(aes(y = Con), shape = 0, color = "gray45") + 
+  geom_point(aes(y = Enab), shape = 1, color = "grey69") +
+  # geom_point(aes(y = Expan), shape = 17, color = "red") +
+  labs(title = "Original CIVIX Scores in EU-15", x = "EU-15 Countries", y = "Original CIVIX Scores") + 
+ggsave("og_civix_plot.jpeg", width = 10, height = 5)
+```
+
+```{r expanded civix, fig.height=2.5, fig.width=5}
+civix = civix %>% arrange(desc(Expan)) %>% 
+  mutate(Country = factor(Country, levels=as.vector(civix$Country))) # %>%
+ggplot(data = civix, mapping = aes(x = Country)) +
+  geom_point(aes(y = Expan)) + 
+  # ylim(0, 8.5) + 
+  geom_point(aes(y = Con), shape = 0, color = "gray45") + 
+  geom_point(aes(y = Enab), shape = 1, color = "grey69") +
+  # geom_point(aes(y = Expan), shape = 17, color = "red") +
+  labs(title = "Expanded CIVIX Scores in EU-15", x = "EU-15 Countries", y = "Expanded CIVIX Scores") + 
+ggsave("expan_civix_plot.jpeg", width = 10, height = 5)
+```
+
+
+```{r bar plot, fig.height=2.5, fig.width=5}
+civix.new = civix %>% gather(key = "measure", value, Original:Expan)
+civix.seq = civix.new %>% filter(measure == "Original") %>% arrange(value)
+civix.new = civix.new %>% group_by(Country) %>% arrange(measure, value) %>%
+  mutate(Country = factor(Country, levels = as.vector(civix.seq$Country)),
+         measure = factor(measure, levels = c("Original", "Con", "Enab","Expan")))
+civix.new = civix.new %>% mutate(
+  cutoff = ifelse(measure == "Original", 2.5,
+                  ifelse(measure == "Expan", 8, NA))
+)
+library(RColorBrewer)
+ggplot(data = civix.new, aes(fill=measure, y=value, x=Country)) + 
+  geom_bar(position = "dodge", stat = "identity") +
+  scale_fill_brewer(palette = "Set3") +
+  labs(title = "Original versus Expanded CIVIX Scores in EU-15", x = "EU-15 Countries", y = "Scores") + 
+  scale_fill_discrete(name = "Measures", labels = c("Original CIVIX", "Conditioning", "Enabling", "Expanded CIVIX")) +
+  geom_hline(yintercept = 2.5, linetype = 3) + 
+  geom_hline(yintercept = 8, linetype = 2) + 
+ggsave("new_civix.jpeg", width = 13, height = 5)
+```
+
